@@ -214,3 +214,4 @@ PAYPAL_TEST = True
 
 # Stripe
 STRIPE_PUBLISH_KEY = get_env_variable('STRIPE_PUBLISH_KEY')
+STRIPE_SECRET_KEY = get_env_variable('STRIPE_SECRET_KEY')

@@ -29,6 +29,9 @@ Virtual Environment
   echo "export STRIPE_PUBLISH_KEY=\"your_stripe_publish_key\"" >> $VIRTUAL_ENV/bin/postactivate
   echo "unset STRIPE_PUBLISH_KEY" >> $VIRTUAL_ENV/bin/postdeactivate
 
+  echo "export STRIPE_SECRET_KEY=\"your_stripe_secret_key\"" >> $VIRTUAL_ENV/bin/postactivate
+  echo "unset STRIPE_SECRET_KEY" >> $VIRTUAL_ENV/bin/postdeactivate
+
   add2virtualenv .
   deactivate
 
