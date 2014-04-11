@@ -16,7 +16,7 @@ from .forms import StripeForm
 class PayPalFormView(LoginRequiredMixin, BaseMixin, FormView):
 
     form_class = PayPalPaymentsForm
-    template_name = 'pay/ask.html'
+    template_name = 'pay/paypal.html'
 
     def get_initial(self):
         return dict(
@@ -38,8 +38,13 @@ class StripeFormView(LoginRequiredMixin, BaseMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super(BaseMixin, self).get_context_data(**kwargs)
-        print(settings.STRIPE_PUBLISH_KEY)
         context.update(dict(
             key=settings.STRIPE_PUBLISH_KEY,
         ))
         return context
+
+    def form_valid(self, form):
+        return super(StripeFormView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('project.home')

@@ -17,11 +17,11 @@ urlpatterns = patterns(
     '',
     url(regex=r'^paypal/$',
         view=PayPalFormView.as_view(),
-        name='paypal.form'
+        name='pay.paypal'
         ),
     url(regex=r'^stripe/$',
         view=StripeFormView.as_view(),
-        name='stripe.form'
+        name='pay.stripe'
         ),
     url(regex=r'^paypal/',
         view=include('paypal.standard.ipn.urls'),
