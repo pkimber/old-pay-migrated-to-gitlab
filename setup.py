@@ -19,20 +19,20 @@ def get_readme():
 
 
 setup(
-    name='pkimber-enquiry',
-    packages=['enquiry', 'enquiry.migrations', 'enquiry.tests', 'enquiry.management', 'enquiry.management.commands'],
+    name='pkimber-pay',
+    packages=['pay', 'pay.tests', 'pay.management', 'pay.management.commands'],
     package_data={
-        'enquiry': [
+        'pay': [
             'static/*.*',
             'templates/*.*',
-            'templates/enquiry/*.*',
+            'templates/pay/*.*',
         ],
     },
-    version='0.0.06',
-    description='enquiry',
+    version='0.0.02',
+    description='pay',
     author='Patrick Kimber',
     author_email='code@pkimber.net',
-    url='git@github.com:pkimber/enquiry.git',
+    url='git@github.com:pkimber/pay.git',
     classifiers=[
         'Development Status :: 1 - Planning',
         'Environment :: Console',
