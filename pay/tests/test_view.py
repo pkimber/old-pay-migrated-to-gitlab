@@ -20,9 +20,9 @@ class TestView(TestCase):
             password=self.web.username
         )
 
-    def test_paypal(self):
-        response = self.client.get(reverse('pay.paypal'))
-        self.assertEqual(response.status_code, 200)
+    #def test_paypal(self):
+    #    response = self.client.get(reverse('pay.paypal'))
+    #    self.assertEqual(response.status_code, 200)
 
     def test_stripe(self):
         response = self.client.get(reverse('pay.stripe'))

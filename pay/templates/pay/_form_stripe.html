@@ -1,0 +1,12 @@
+{% load staticfiles %}
+
+{% csrf_token %}
+<script
+  src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+  data-key="{{ key }}"
+  data-amount="2000"
+  data-currency="GBP"
+  data-name="pkimber.net"
+  data-description="Cheddar cheese (2 x £10.00)"
+  data-image="{% static 'project/stripe/128x128.png' %}">
+</script>

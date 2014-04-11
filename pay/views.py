@@ -8,35 +8,34 @@ from django.core.urlresolvers import reverse
 from django.views.generic import FormView
 
 from braces.views import LoginRequiredMixin
-from paypal.standard.forms import PayPalPaymentsForm
+#from paypal.standard.forms import PayPalPaymentsForm
 
 from base.view_utils import BaseMixin
 
 from .forms import StripeForm
 
 
-class PayPalFormView(LoginRequiredMixin, BaseMixin, FormView):
+#class PayPalFormView(LoginRequiredMixin, BaseMixin, FormView):
+#
+#    form_class = PayPalPaymentsForm
+#    template_name = 'pay/paypal.html'
+#
+#    def get_initial(self):
+#        return dict(
+#            business=settings.PAYPAL_RECEIVER_EMAIL,
+#            amount='10.01',
+#            currency_code='GBP',
+#            item_name='Cycle Routes around Hatherleigh',
+#            invoice='0001',
+#            notify_url="https://www.example.com" + reverse('paypal-ipn'),
+#            return_url="https://www.example.com/your-return-location/",
+#            cancel_return="https://www.example.com/your-cancel-location/",
+#        )
 
-    form_class = PayPalPaymentsForm
-    template_name = 'pay/paypal.html'
 
-    def get_initial(self):
-        return dict(
-            business=settings.PAYPAL_RECEIVER_EMAIL,
-            amount='10.01',
-            currency_code='GBP',
-            item_name='Cycle Routes around Hatherleigh',
-            invoice='0001',
-            notify_url="https://www.example.com" + reverse('paypal-ipn'),
-            return_url="https://www.example.com/your-return-location/",
-            cancel_return="https://www.example.com/your-cancel-location/",
-        )
-
-
-class StripeFormView(LoginRequiredMixin, BaseMixin, FormView):
+class StripeFormMixin(object):
 
     form_class = StripeForm
-    template_name = 'pay/stripe.html'
 
     def get_context_data(self, **kwargs):
         context = super(BaseMixin, self).get_context_data(**kwargs)
@@ -62,6 +61,12 @@ class StripeFormView(LoginRequiredMixin, BaseMixin, FormView):
             # The card has been declined
             pass
         return super(StripeFormView, self).form_valid(form)
+
+
+class StripeFormView(
+        LoginRequiredMixin, StripeFormMixin, BaseMixin, FormView):
+
+    template_name = 'pay/stripe.html'
 
     def get_success_url(self):
         return reverse('project.home')

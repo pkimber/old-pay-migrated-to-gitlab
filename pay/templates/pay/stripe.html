@@ -1,5 +1,4 @@
 {% extends "project/base.html" %}
-{% load staticfiles %}
 
 {% block sub_title %}
   Stripe
@@ -14,16 +13,7 @@
     <div class="pure-u-1">
       <div class="l-box">
         <form action="" method="POST">
-          {% csrf_token %}
-          <script
-            src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-            data-key="{{ key }}"
-            data-amount="2000"
-            data-currency="GBP"
-            data-name="pkimber.net"
-            data-description="Cheddar cheese (2 x £10.00)"
-            data-image="{% static 'project/stripe/128x128.png' %}">
-          </script>
+          {% include 'pay/_form_stripe.html' %}
         </form>
       </div>
     </div>

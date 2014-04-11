@@ -141,7 +141,6 @@ DJANGO_APPS = (
 )
 
 THIRD_PARTY_APPS = (
-    'paypal.standard.ipn',
     'reversion',
     'south',
 )

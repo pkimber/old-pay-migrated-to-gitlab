@@ -4,7 +4,6 @@ django-reversion==1.8.0
 django-sendfile
 Django==1.6.2
 git+https://github.com/BradWhittington/django-mailgun.git#egg=django_mailgun
-git+https://github.com/spookylukey/django-paypal.git#egg=paypal
 python-dateutil
 South==0.8.4
 stripe

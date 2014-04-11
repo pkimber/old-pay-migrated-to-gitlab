@@ -8,22 +8,22 @@ from django.conf.urls import (
 )
 
 from .views import (
-    PayPalFormView,
+    #PayPalFormView,
     StripeFormView,
 )
 
 
 urlpatterns = patterns(
     '',
-    url(regex=r'^paypal/$',
-        view=PayPalFormView.as_view(),
-        name='pay.paypal'
-        ),
+    #url(regex=r'^paypal/$',
+    #    view=PayPalFormView.as_view(),
+    #    name='pay.paypal'
+    #    ),
     url(regex=r'^stripe/$',
         view=StripeFormView.as_view(),
         name='pay.stripe'
         ),
-    url(regex=r'^paypal/',
-        view=include('paypal.standard.ipn.urls'),
-        ),
+    #url(regex=r'^paypal/',
+    #    view=include('paypal.standard.ipn.urls'),
+    #    ),
 )
