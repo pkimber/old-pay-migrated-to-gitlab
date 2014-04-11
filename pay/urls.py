@@ -7,14 +7,21 @@ from django.conf.urls import (
     url,
 )
 
-from .views import AskForMoneyView
+from .views import (
+    PayPalFormView,
+    StripeFormView,
+)
 
 
 urlpatterns = patterns(
     '',
-    url(regex=r'^ask/$',
-        view=AskForMoneyView.as_view(),
-        name='pay.ask'
+    url(regex=r'^paypal/$',
+        view=PayPalFormView.as_view(),
+        name='paypal.form'
+        ),
+    url(regex=r'^stripe/$',
+        view=StripeFormView.as_view(),
+        name='stripe.form'
         ),
     url(regex=r'^paypal/',
         view=include('paypal.standard.ipn.urls'),

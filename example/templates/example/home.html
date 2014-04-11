@@ -15,8 +15,13 @@
       <div class="pure-menu pure-menu-open pure-menu-horizontal">
         <ul>
           <li>
-            <a href="{% url 'pay.ask' %}">
-              Ask for money
+            <a href="{% url 'paypal.form' %}">
+              PayPal
+            </a>
+          </li>
+          <li>
+            <a href="{% url 'stripe.form' %}">
+              Stripe
             </a>
           </li>
         </ul>

@@ -10,8 +10,10 @@ from paypal.standard.forms import PayPalPaymentsForm
 
 from base.view_utils import BaseMixin
 
+from .forms import StripeForm
 
-class AskForMoneyView(LoginRequiredMixin, BaseMixin, FormView):
+
+class PayPalFormView(LoginRequiredMixin, BaseMixin, FormView):
 
     form_class = PayPalPaymentsForm
     template_name = 'pay/ask.html'
@@ -27,3 +29,17 @@ class AskForMoneyView(LoginRequiredMixin, BaseMixin, FormView):
             return_url="https://www.example.com/your-return-location/",
             cancel_return="https://www.example.com/your-cancel-location/",
         )
+
+
+class StripeFormView(LoginRequiredMixin, BaseMixin, FormView):
+
+    form_class = StripeForm
+    template_name = 'pay/stripe.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseMixin, self).get_context_data(**kwargs)
+        print(settings.STRIPE_PUBLISH_KEY)
+        context.update(dict(
+            key=settings.STRIPE_PUBLISH_KEY,
+        ))
+        return context

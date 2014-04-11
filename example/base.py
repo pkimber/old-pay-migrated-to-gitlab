@@ -210,3 +210,6 @@ SENDFILE_ROOT = 'media-private'
 # https://github.com/spookylukey/django-paypal
 PAYPAL_RECEIVER_EMAIL = get_env_variable('PAYPAL_RECEIVER_EMAIL')
 PAYPAL_TEST = True
+
+# Stripe
+STRIPE_PUBLISH_KEY = get_env_variable('STRIPE_PUBLISH_KEY')

@@ -15,6 +15,8 @@ Virtual Environment
 .. note:: Replace ``patrick`` with your name (check in the ``settings`` folder
           to make sure a file has been created for you).
 
+.. note:: Replace ``your_stripe_publish_key`` with your Stripe *Publishable* key.
+
   mkvirtualenv dev_pay
   pip install -r requirements/local.txt
 
@@ -22,7 +24,10 @@ Virtual Environment
   echo "unset DJANGO_SETTINGS_MODULE" >> $VIRTUAL_ENV/bin/postdeactivate
 
   echo "export PAYPAL_RECEIVER_EMAIL=\"merchant@pkimber.net\"" >> $VIRTUAL_ENV/bin/postactivate
-  echo "unset PAYPAL_RECEIVER_EMAIL=" >> $VIRTUAL_ENV/bin/postdeactivate
+  echo "unset PAYPAL_RECEIVER_EMAIL" >> $VIRTUAL_ENV/bin/postdeactivate
+
+  echo "export STRIPE_PUBLISH_KEY=\"your_stripe_publish_key\"" >> $VIRTUAL_ENV/bin/postactivate
+  echo "unset STRIPE_PUBLISH_KEY" >> $VIRTUAL_ENV/bin/postdeactivate
 
   add2virtualenv .
   deactivate
