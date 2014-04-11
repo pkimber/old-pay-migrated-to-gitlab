@@ -208,5 +208,5 @@ SENDFILE_BACKEND = 'sendfile.backends.development'
 SENDFILE_ROOT = 'media-private'
 
 # https://github.com/spookylukey/django-paypal
-PAYPAL_RECEIVER_EMAIL = 'pay@pkimber.net'
+PAYPAL_RECEIVER_EMAIL = get_env_variable('PAYPAL_RECEIVER_EMAIL')
 PAYPAL_TEST = True
