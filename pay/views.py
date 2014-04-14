@@ -60,7 +60,7 @@ class StripeFormMixin(object):
         except stripe.CardError as e:
             # The card has been declined
             pass
-        return super(StripeFormView, self).form_valid(form)
+        return super(StripeFormMixin, self).form_valid(form)
 
 
 class StripeFormView(
