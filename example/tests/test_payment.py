@@ -15,13 +15,13 @@ from pay.tests.model_maker import (
     make_payment,
     make_product,
 )
-from pay.tests.scenario import init_pay
+from pay.tests.scenario import init_app_pay
 
 
 class TestPayment(TestCase):
 
     def setUp(self):
-        init_pay()
+        init_app_pay()
         self.pencil = make_product('Pencil', 'pencil', Decimal('1.32'))
 
     def test_make_payment(self):
