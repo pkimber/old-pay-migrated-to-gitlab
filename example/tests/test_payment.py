@@ -7,21 +7,28 @@ from django.db import IntegrityError
 from django.test import TestCase
 
 from base.tests.model_maker import clean_and_save
-from example.tests.model_maker import make_sales_ledger
 
-from pay.models import Payment
+from pay.models import (
+    Payment,
+    STATE_FAIL,
+)
 from pay.tests.model_maker import (
     make_payment,
     make_product,
 )
 from pay.tests.scenario import init_app_pay
 
+from example.models import SalesLedger
+from example.tests.model_maker import make_sales_ledger
 
 class TestPayment(TestCase):
 
     def setUp(self):
         init_app_pay()
         self.pencil = make_product('Pencil', 'pencil', Decimal('1.32'))
+
+    def _get_payment(self):
+        return Payment.objects.get(email='test@pkimber.net')
 
     def _make_payment(self, line):
         return make_payment(
@@ -45,6 +52,29 @@ class TestPayment(TestCase):
             clean_and_save,
             payment,
         )
+
+    def test_set_paid(self):
+        line = make_sales_ledger('Carol')
+        self.assertFalse(line.is_paid)
+        payment = self._make_payment(line)
+        self.assertFalse(payment.is_paid())
+        payment.set_paid()
+        payment = self._get_payment()
+        self.assertTrue(payment.is_paid())
+        line = SalesLedger.objects.get(title='Carol')
+        self.assertTrue(line.is_paid)
+
+    def test_set_payment_failed(self):
+        line = make_sales_ledger('Carol')
+        self.assertFalse(line.is_paid)
+        payment = self._make_payment(line)
+        self.assertFalse(payment.is_paid())
+        payment.set_payment_failed()
+        payment = self._get_payment()
+        self.assertFalse(payment.is_paid())
+        line = SalesLedger.objects.get(title='Carol')
+        self.assertFalse(line.is_paid)
+        self.assertEqual(STATE_FAIL, payment.state.slug)
 
     def test_total(self):
         line = make_sales_ledger('Carol')

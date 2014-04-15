@@ -21,7 +21,7 @@ def default_scenario_pay():
         Decimal('10.00'),
         make_sales_ledger('Carol'),
     )
-    print('make_payment: {}'.format(payment.description))
+    #print('make_payment: {}'.format(payment.description))
     payment = make_payment(
         'a@pkimber.net',
         pencil,
@@ -30,4 +30,4 @@ def default_scenario_pay():
         Decimal('2.50'),
         make_sales_ledger('Andi'),
     )
-    print('make_payment: {}'.format(payment.description))
+    #print('make_payment: {}'.format(payment.description))

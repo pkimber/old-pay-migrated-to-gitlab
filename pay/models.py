@@ -13,10 +13,22 @@ from base.model_utils import TimeStampedModel
 
 
 STATE_DUE = 'due'
+STATE_FAIL = 'fail'
+STATE_PAID = 'paid'
 
 
 def _default_payment_state():
     return PaymentState.objects.get(slug=STATE_DUE)
+
+
+class PayError(Exception):
+
+    def __init__(self, value):
+        Exception.__init__(self)
+        self.value = value
+
+    def __str__(self):
+        return repr('%s, %s' % (self.__class__.__name__, self.value))
 
 
 class Product(TimeStampedModel):
@@ -90,7 +102,32 @@ class Payment(TimeStampedModel):
         return self.price * self.quantity
     total = property(_total)
 
+    def check_can_pay(self):
+        if not self.state.slug in (STATE_DUE, STATE_FAIL):
+            raise PayError(
+                'Cannot save token (transaction is not due or '
+                'failed) [{}]'.format(self.pk)
+            )
+
+    def is_paid(self):
+        return self.state.slug == STATE_PAID
+
+    def save_token(self, token):
+        self.check_can_pay()
+        self.token = token
+        self.save()
+
+    def set_paid(self):
+        self.state = PaymentState.objects.get(slug=STATE_PAID)
+        self.content_object.set_paid()
+        self.save()
+
+    def set_payment_failed(self):
+        self.state = PaymentState.objects.get(slug=STATE_FAIL)
+        self.content_object.set_payment_failed()
+        self.save()
+
     def total_as_pennies(self):
-        return self.total * Decimal('100')
+        return int(self.total * Decimal('100'))
 
 reversion.register(Payment)

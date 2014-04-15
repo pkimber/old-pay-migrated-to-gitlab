@@ -11,6 +11,8 @@ from .forms import StripeForm
 from .models import Payment
 
 
+CURRENCY = 'GBP'
+
 #class PayPalFormView(LoginRequiredMixin, BaseMixin, FormView):
 #
 #    form_class = PayPalPaymentsForm
@@ -36,8 +38,9 @@ class StripeFormMixin(object):
 
     def get_context_data(self, **kwargs):
         context = super(StripeFormMixin, self).get_context_data(**kwargs)
+        self.object.check_can_pay()
         context.update(dict(
-            currency='GBP',
+            currency=CURRENCY,
             description=self.object.description,
             email=self.object.email,
             key=settings.STRIPE_PUBLISH_KEY,
@@ -47,19 +50,30 @@ class StripeFormMixin(object):
         return context
 
     def form_valid(self, form):
+        self.object = form.save(commit=False)
         # Create the charge on Stripe's servers - this will charge the user's card
         token = form.cleaned_data['stripeToken']
+        self.object.save_token(token)
         # Set your secret key: remember to change this to your live secret key
         # in production.  See your keys here https://manage.stripe.com/account
         stripe.api_key = settings.STRIPE_SECRET_KEY
         try:
             charge = stripe.Charge.create(
-                amount=1000, # amount in cents, again
-                currency="GBP",
+                amount=self.object.total_as_pennies(), # amount in pennies, again
+                currency=CURRENCY,
                 card=token,
-                description="payinguser@example.com"
+                description=self.object.email,
             )
+            self.object.set_paid()
         except stripe.CardError as e:
+            self.object.set_payment_failed()
             # The card has been declined
-            pass
+            body = e.json_body
+            err  = body['error']
+            print("Status is: %s" % e.http_status)
+            print("Type is: %s" % err['type'])
+            print("Code is: %s" % err['code'])
+            # param is '' in this case
+            print("Param is: %s" % err['param'])
+            print("Message is: %s" % err['message'])
         return super(StripeFormMixin, self).form_valid(form)
