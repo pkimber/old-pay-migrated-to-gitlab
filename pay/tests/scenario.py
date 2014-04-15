@@ -8,10 +8,6 @@ from pay.models import (
 from pay.tests.model_maker import make_payment_state
 
 
-def default_scenario_pay():
-    pass
-
-
 def _init_payment_state(name, slug):
     try:
         state = PaymentState.objects.get(slug=slug)

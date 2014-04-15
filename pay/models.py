@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from decimal import Decimal
+
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -55,27 +57,40 @@ reversion.register(PaymentState)
 class Payment(TimeStampedModel):
     """List of payments."""
 
+    email = models.EmailField()
     product = models.ForeignKey(Product)
-    quantity = models.DecimalField(max_digits=8, decimal_places=2)
+    title = models.CharField(max_length=100)
+    quantity = models.IntegerField()
+    # we store the price in case the product is edited!
+    price = models.DecimalField(max_digits=8, decimal_places=2)
     state = models.ForeignKey(
         PaymentState,
         default=_default_payment_state,
     )
-    # who requested the payment
+    # link to the object in the system which requested the payment
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
 
     class Meta:
         ordering = ('pk',)
+        # payment should only link to one other object.
+        unique_together = ('object_id', 'content_type')
         verbose_name = 'Payment'
         verbose_name_plural = 'Payment'
 
     def __str__(self):
-        return '{}'.format(self.total)
+        return '{} = {}'.format(self.description, self.total)
+
+    def _description(self):
+        return '{} ({} x £{:.2f})'.format(self.title, self.quantity, self.price)
+    description = property(_description)
 
     def _total(self):
-        return self.product.price * self.quantity
+        return self.price * self.quantity
     total = property(_total)
+
+    def total_as_pennies(self):
+        return self.total * Decimal('100')
 
 reversion.register(Payment)

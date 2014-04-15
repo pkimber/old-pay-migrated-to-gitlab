@@ -4,9 +4,10 @@
 <script
   src="https://checkout.stripe.com/checkout.js" class="stripe-button"
   data-key="{{ key }}"
-  data-amount="2000"
-  data-currency="GBP"
-  data-name="pkimber.net"
-  data-description="Cheddar cheese (2 x £10.00)"
+  data-amount="{{ total }}"
+  data-currency="{{ currency }}"
+  data-name="{{ name }}"
+  data-email="{{ email }}"
+  data-description="{{ description }}"
   data-image="{% static 'project/stripe/128x128.png' %}">
 </script>

@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from decimal import Decimal
+
 import stripe
 
 from django.conf import settings
@@ -13,6 +15,7 @@ from braces.views import LoginRequiredMixin
 from base.view_utils import BaseMixin
 
 from .forms import StripeForm
+from .models import Payment
 
 
 #class PayPalFormView(LoginRequiredMixin, BaseMixin, FormView):
@@ -36,11 +39,17 @@ from .forms import StripeForm
 class StripeFormMixin(object):
 
     form_class = StripeForm
+    model = Payment
 
     def get_context_data(self, **kwargs):
-        context = super(BaseMixin, self).get_context_data(**kwargs)
+        context = super(StripeFormMixin, self).get_context_data(**kwargs)
         context.update(dict(
+            currency='GBP',
+            description=self.object.description,
+            email=self.object.email,
             key=settings.STRIPE_PUBLISH_KEY,
+            name=settings.STRIPE_CAPTION,
+            total=self.object.total_as_pennies(),
         ))
         return context
 
@@ -61,12 +70,3 @@ class StripeFormMixin(object):
             # The card has been declined
             pass
         return super(StripeFormMixin, self).form_valid(form)
-
-
-class StripeFormView(
-        LoginRequiredMixin, StripeFormMixin, BaseMixin, FormView):
-
-    template_name = 'pay/stripe.html'
-
-    def get_success_url(self):
-        return reverse('project.home')

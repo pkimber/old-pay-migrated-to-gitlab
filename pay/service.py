@@ -18,5 +18,5 @@ def init_product(slug, title, description, price):
         if not description:
             description = ''
         result = make_product(slug, title, price, description=description)
-        print('make_product("{}")'.format(title))
+        #print('make_product("{}")'.format(title))
     return result

@@ -12,10 +12,14 @@ from pay.models import (
 )
 
 
-def make_payment(product, quantity, content_object, **kwargs):
+def make_payment(
+        email, product, title, quantity, price, content_object, **kwargs):
     defaults = dict(
+        email=email,
         product=product,
+        title=title,
         quantity=quantity,
+        price=price,
         content_object=content_object,
     )
     defaults.update(kwargs)

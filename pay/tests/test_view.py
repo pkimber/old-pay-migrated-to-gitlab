@@ -9,21 +9,14 @@ from login.tests.scenario import (
     get_user_web,
 )
 
+from pay.tests.scenario import init_app_pay
+
 
 class TestView(TestCase):
 
-    def setUp(self):
-        default_scenario_login()
-        self.web = get_user_web()
-        self.client.login(
-            username=self.web.username,
-            password=self.web.username
-        )
+    pass
 
     #def test_paypal(self):
     #    response = self.client.get(reverse('pay.paypal'))
     #    self.assertEqual(response.status_code, 200)
 
-    def test_stripe(self):
-        response = self.client.get(reverse('pay.stripe'))
-        self.assertEqual(response.status_code, 200)
