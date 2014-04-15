@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 
-from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.test import TestCase
 

@@ -1,18 +1,11 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from decimal import Decimal
-
 import stripe
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.views.generic import FormView
 
-from braces.views import LoginRequiredMixin
 #from paypal.standard.forms import PayPalPaymentsForm
-
-from base.view_utils import BaseMixin
 
 from .forms import StripeForm
 from .models import Payment
