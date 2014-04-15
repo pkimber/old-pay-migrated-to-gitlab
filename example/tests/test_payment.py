@@ -23,8 +23,7 @@ class TestPayment(TestCase):
         init_app_pay()
         self.pencil = make_product('Pencil', 'pencil', Decimal('1.32'))
 
-    def _make_payment(self):
-        line = make_sales_ledger('Carol')
+    def _make_payment(self, line):
         return make_payment(
             'test@pkimber.net',
             self.pencil,
@@ -35,7 +34,8 @@ class TestPayment(TestCase):
         )
 
     def test_make_payment(self):
-        self._make_payment()
+        line = make_sales_ledger('Carol')
+        self._make_payment(line)
 
     def test_no_content_object(self):
         """Payments must be linked to a content object."""
@@ -60,4 +60,9 @@ class TestPayment(TestCase):
 
     def test_unique_together(self):
         line = make_sales_ledger('Carol')
-        self._make_payment()
+        self._make_payment(line)
+        self.assertRaises(
+            IntegrityError,
+            self._make_payment,
+            line,
+        )
