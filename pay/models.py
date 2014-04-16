@@ -12,13 +12,8 @@ import reversion
 from base.model_utils import TimeStampedModel
 
 
-STATE_DUE = 'due'
-STATE_FAIL = 'fail'
-STATE_PAID = 'paid'
-
-
-def _default_payment_state():
-    return PaymentState.objects.get(slug=STATE_DUE)
+def default_payment_state():
+    return PaymentState.objects.get(slug=PaymentState.DUE)
 
 
 class PayError(Exception):
@@ -52,6 +47,10 @@ reversion.register(Product)
 
 class PaymentState(TimeStampedModel):
 
+    DUE = 'due'
+    FAIL = 'fail'
+    PAID = 'paid'
+
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
 
@@ -77,7 +76,7 @@ class Payment(TimeStampedModel):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     state = models.ForeignKey(
         PaymentState,
-        default=_default_payment_state,
+        default=default_payment_state,
     )
     # link to the object in the system which requested the payment
     content_type = models.ForeignKey(ContentType)
@@ -103,14 +102,14 @@ class Payment(TimeStampedModel):
     total = property(_total)
 
     def check_can_pay(self):
-        if not self.state.slug in (STATE_DUE, STATE_FAIL):
+        if not self.state.slug in (PaymentState.DUE, PaymentState.FAIL):
             raise PayError(
                 'Cannot save token (transaction is not due or '
                 'failed) [{}]'.format(self.pk)
             )
 
     def is_paid(self):
-        return self.state.slug == STATE_PAID
+        return self.state.slug == PaymentState.PAID
 
     def save_token(self, token):
         self.check_can_pay()
@@ -118,12 +117,12 @@ class Payment(TimeStampedModel):
         self.save()
 
     def set_paid(self):
-        self.state = PaymentState.objects.get(slug=STATE_PAID)
+        self.state = PaymentState.objects.get(slug=PaymentState.PAID)
         self.content_object.set_paid()
         self.save()
 
     def set_payment_failed(self):
-        self.state = PaymentState.objects.get(slug=STATE_FAIL)
+        self.state = PaymentState.objects.get(slug=PaymentState.FAIL)
         self.content_object.set_payment_failed()
         self.save()
 

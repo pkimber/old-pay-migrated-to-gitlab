@@ -10,7 +10,7 @@ from base.tests.model_maker import clean_and_save
 
 from pay.models import (
     Payment,
-    STATE_FAIL,
+    PaymentState,
 )
 from pay.tests.model_maker import (
     make_payment,
@@ -74,7 +74,7 @@ class TestPayment(TestCase):
         self.assertFalse(payment.is_paid())
         line = SalesLedger.objects.get(title='Carol')
         self.assertFalse(line.is_paid)
-        self.assertEqual(STATE_FAIL, payment.state.slug)
+        self.assertEqual(PaymentState.FAIL, payment.state.slug)
 
     def test_total(self):
         line = make_sales_ledger('Carol')

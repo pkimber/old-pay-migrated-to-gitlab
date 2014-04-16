@@ -1,12 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from pay.models import (
-    PaymentState,
-    STATE_DUE,
-    STATE_FAIL,
-    STATE_PAID,
-)
+from pay.models import PaymentState
 from pay.tests.model_maker import make_payment_state
 
 
@@ -21,6 +16,6 @@ def _init_payment_state(name, slug):
 
 
 def init_app_pay():
-    _init_payment_state('Due', STATE_DUE)
-    _init_payment_state('Fail', STATE_FAIL)
-    _init_payment_state('Paid', STATE_PAID)
+    _init_payment_state('Due', PaymentState.DUE)
+    _init_payment_state('Fail', PaymentState.FAIL)
+    _init_payment_state('Paid', PaymentState.PAID)
