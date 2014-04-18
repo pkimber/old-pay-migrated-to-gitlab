@@ -104,8 +104,8 @@ class Payment(TimeStampedModel):
     def check_can_pay(self):
         if not self.state.slug in (PaymentState.DUE, PaymentState.FAIL):
             raise PayError(
-                'Cannot save token (transaction is not due or '
-                'failed) [{}]'.format(self.pk)
+                'Cannot pay this transaction (it is not due or '
+                'failed earlier) [{}]'.format(self.pk)
             )
 
     def is_paid(self):
