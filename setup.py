@@ -20,7 +20,7 @@ def get_readme():
 
 setup(
     name='pkimber-pay',
-    packages=['pay', 'pay.tests', 'pay.management', 'pay.management.commands'],
+    packages=['pay', 'pay.migrations', 'pay.tests', 'pay.management', 'pay.management.commands'],
     package_data={
         'pay': [
             'static/*.*',
@@ -28,7 +28,7 @@ setup(
             'templates/pay/*.*',
         ],
     },
-    version='0.0.03',
+    version='0.0.04',
     description='pay',
     author='Patrick Kimber',
     author_email='code@pkimber.net',
