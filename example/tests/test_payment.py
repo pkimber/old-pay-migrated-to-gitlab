@@ -37,7 +37,8 @@ class TestPayment(TestCase):
             'Colour pencils',
             1,
             Decimal('10.00'),
-            line
+            line,
+            '/url/after/',
         )
 
     def test_make_payment(self):
@@ -46,7 +47,9 @@ class TestPayment(TestCase):
 
     def test_no_content_object(self):
         """Payments must be linked to a content object."""
-        payment = Payment(**dict(product=self.pencil, quantity=Decimal(2)))
+        payment = Payment(**dict(
+            product=self.pencil, quantity=Decimal(2), url='/after/')
+        )
         self.assertRaises(
             IntegrityError,
             clean_and_save,
@@ -84,7 +87,8 @@ class TestPayment(TestCase):
             'Colour pencils',
             2,
             Decimal('1.32'),
-            line
+            line,
+            '/url/after/'
         )
         self.assertEqual(Decimal('2.64'), payment.total)
 

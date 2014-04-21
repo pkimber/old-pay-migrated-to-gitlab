@@ -20,6 +20,7 @@ def default_scenario_pay():
         1,
         Decimal('10.00'),
         make_sales_ledger('Carol'),
+        '/url/after/',
     )
     make_payment(
         'a@pkimber.net',
@@ -28,4 +29,5 @@ def default_scenario_pay():
         2,
         Decimal('2.50'),
         make_sales_ledger('Andi'),
+        '/url/after/',
     )

@@ -78,6 +78,10 @@ class Payment(TimeStampedModel):
         PaymentState,
         default=default_payment_state,
     )
+    url = models.CharField(
+        max_length=100,
+        help_text='redirect to this location after payment.'
+    )
     # link to the object in the system which requested the payment
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
