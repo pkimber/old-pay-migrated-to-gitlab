@@ -11,7 +11,10 @@ from django.http import HttpResponseRedirect
 #from paypal.standard.forms import PayPalPaymentsForm
 
 from .forms import StripeForm
-from .models import Payment
+from .models import (
+    Payment,
+    StripeCustomer,
+)
 
 
 CURRENCY = 'GBP'
@@ -55,6 +58,70 @@ class StripeFormViewMixin(object):
             logger.critical('payment check: invalid')
             raise PermissionDenied('Valid payment check failed.')
 
+    def _init_stripe_customer(self, email, token):
+        """Make sure a stripe customer is created and update card (token)."""
+        result = None
+        try:
+            c = StripeCustomer.objects.get(email=email)
+            self._stripe_customer_update(c.customer_id, token)
+            result = c.customer_id
+        except StripeCustomer.DoesNotExist:
+            customer = self._stripe_customer_create(email, token)
+            c = StripeCustomer(**dict(
+                email=email,
+                customer_id=customer.id,
+            ))
+            c.save()
+            result = c.customer_id
+        return result
+
+    def _log_card_error(self, payment_pk):
+        logger.error(
+            'CardError\n'
+            'payment: {}\n'
+            'param: {}\n'
+            'code: {}\n'
+            'http body: {}\n'
+            'http status: {}'.format(
+                payment_pk,
+                e.param,
+                e.code,
+                e.http_body,
+                e.http_status,
+            )
+        )
+
+    def _log_stripe_error(self, e, message):
+        logger.error(
+            'StripeError\n'
+            '{}\n'
+            'http body: {}\n'
+            'http status: {}'.format(
+                message,
+                e.http_body,
+                e.http_status,
+            )
+        )
+
+    def _stripe_customer_create(self, email, token):
+        """Use the Stripe API to create/update a customer."""
+        try:
+            return stripe.Customer.create(
+                card=token,
+                email=email,
+            )
+        except stripe.StripeError as e:
+            self._log_stripe_error(e, 'create - email: {}'.format(email))
+
+    def _stripe_customer_update(self, customer_id, token):
+        """Use the Stripe API to create/update a customer."""
+        try:
+            customer = stripe.Customer.retrieve(customer_id)
+            customer.card = token
+            customer.save()
+        except stripe.StripeError as e:
+            self._log_stripe_error(e, 'update - id: {}'.format(customer_id))
+
     def get_context_data(self, **kwargs):
         context = super(StripeFormViewMixin, self).get_context_data(**kwargs)
         self._check_perm()
@@ -78,43 +145,21 @@ class StripeFormViewMixin(object):
         # in production.  See your keys here https://manage.stripe.com/account
         stripe.api_key = settings.STRIPE_SECRET_KEY
         try:
+            customer_id = self._init_stripe_customer(self.object.email, token)
             charge = stripe.Charge.create(
                 amount=self.object.total_as_pennies(), # amount in pennies, again
                 currency=CURRENCY,
-                card=token,
-                description=self.object.email,
+                customer=customer_id,
+                description=self.object.description,
             )
             self.object.set_paid()
             result = super(StripeFormViewMixin, self).form_valid(form)
         except stripe.CardError as e:
             self.object.set_payment_failed()
-            # The card has been declined
-            logger.error(
-                'CardError\n'
-                'payment: {}\n'
-                'param: {}\n'
-                'code: {}\n'
-                'http body: {}\n'
-                'http status: {}'.format(
-                    self.object.pk,
-                    e.param,
-                    e.code,
-                    e.http_body,
-                    e.http_status,
-                )
-            )
+            self._log_card_error(e, self.object.pk)
             result = HttpResponseRedirect(self.object.url_failure)
         except stripe.StripeError as e:
             self.object.set_payment_failed()
-            logger.error(
-                'StripeError\n'
-                'payment: {}\n'
-                'http body: {}\n'
-                'http status: {}'.format(
-                    self.object.pk,
-                    e.http_body,
-                    e.http_status,
-                )
-            )
+            self._log_stripe_error(e, 'payment: {}'.format(self.object.pk))
             result = HttpResponseRedirect(self.object.url_failure)
         return result

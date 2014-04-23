@@ -138,3 +138,19 @@ class Payment(TimeStampedModel):
         return int(self.total * Decimal('100'))
 
 reversion.register(Payment)
+
+
+class StripeCustomer(TimeStampedModel):
+
+    email = models.EmailField(unique=True)
+    customer_id = models.TextField()
+
+    class Meta:
+        ordering = ('pk',)
+        verbose_name = 'Stripe customer'
+        verbose_name_plural = 'Stripe customers'
+
+    def __str__(self):
+        return '{} ({})'.format(self.email, self.customer_id)
+
+reversion.register(StripeCustomer)
