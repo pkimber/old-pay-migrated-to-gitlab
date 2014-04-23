@@ -10,7 +10,7 @@ from django.views.generic import (
 from base.view_utils import BaseMixin
 
 from pay.models import Payment
-from pay.views import StripeFormMixin
+from pay.views import StripeFormViewMixin
 
 
 class HomeView(ListView):
@@ -19,7 +19,7 @@ class HomeView(ListView):
     template_name = 'example/home.html'
 
 
-class StripeUpdateView(StripeFormMixin, BaseMixin, UpdateView):
+class StripeUpdateView(StripeFormViewMixin, BaseMixin, UpdateView):
 
     template_name = 'pay/stripe.html'
 

@@ -11,6 +11,7 @@ from login.tests.scenario import (
 
 from pay.models import Payment
 from pay.tests.scenario import init_app_pay
+from pay.views import PAYMENT_PK
 
 from example.tests.scenario import default_scenario_pay
 
@@ -33,6 +34,11 @@ class TestView(TestCase):
 
     def test_stripe(self):
         payment = Payment.objects.get(email='test@pkimber.net')
+        # Session variables difficult to test ref:
+        # http://stackoverflow.com/questions/4453764/how-do-i-modify-the-session-in-the-django-test-framework
+        session = self.client.session
+        session[PAYMENT_PK] = payment.pk
+        session.save()
         response = self.client.get(
             reverse('pay.stripe', kwargs=dict(pk=payment.pk))
         )

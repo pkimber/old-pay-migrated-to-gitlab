@@ -1,9 +1,11 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+import logging
 import stripe
 
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 #from paypal.standard.forms import PayPalPaymentsForm
 
@@ -12,6 +14,9 @@ from .models import Payment
 
 
 CURRENCY = 'GBP'
+PAYMENT_PK = 'payment_pk'
+
+logger = logging.getLogger(__name__)
 
 #class PayPalFormView(LoginRequiredMixin, BaseMixin, FormView):
 #
@@ -31,13 +36,27 @@ CURRENCY = 'GBP'
 #        )
 
 
-class StripeFormMixin(object):
+class StripeFormViewMixin(object):
 
     form_class = StripeForm
     model = Payment
 
+    def _check_perm(self):
+        payment_pk = self.request.session.get(PAYMENT_PK, None)
+        if payment_pk:
+            if not payment_pk == self.object.pk:
+                logger.critical(
+                    'payment check: invalid {} != {}'.format(
+                        payment_pk, self.object.pk,
+                ))
+                raise PermissionDenied('Valid payment check fail.')
+        else:
+            logger.critical('payment check: invalid')
+            raise PermissionDenied('Valid payment check failed.')
+
     def get_context_data(self, **kwargs):
-        context = super(StripeFormMixin, self).get_context_data(**kwargs)
+        context = super(StripeFormViewMixin, self).get_context_data(**kwargs)
+        self._check_perm()
         self.object.check_can_pay()
         context.update(dict(
             currency=CURRENCY,
@@ -76,4 +95,4 @@ class StripeFormMixin(object):
             # param is '' in this case
             print("Param is: %s" % err['param'])
             print("Message is: %s" % err['message'])
-        return super(StripeFormMixin, self).form_valid(form)
+        return super(StripeFormViewMixin, self).form_valid(form)
