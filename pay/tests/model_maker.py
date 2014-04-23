@@ -13,7 +13,8 @@ from pay.models import (
 
 
 def make_payment(
-        email, product, title, quantity, price, content_object, url, **kwargs):
+        email, product, title, quantity, price,
+        content_object, url, url_failure, **kwargs):
     defaults = dict(
         email=email,
         product=product,
@@ -22,6 +23,7 @@ def make_payment(
         price=price,
         content_object=content_object,
         url=url,
+        url_failure=url_failure,
     )
     defaults.update(kwargs)
     return clean_and_save(Payment(**defaults))

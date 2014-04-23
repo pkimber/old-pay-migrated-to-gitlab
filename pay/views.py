@@ -6,6 +6,7 @@ import stripe
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 
 #from paypal.standard.forms import PayPalPaymentsForm
 
@@ -84,6 +85,7 @@ class StripeFormViewMixin(object):
                 description=self.object.email,
             )
             self.object.set_paid()
+            result = super(StripeFormViewMixin, self).form_valid(form)
         except stripe.CardError as e:
             self.object.set_payment_failed()
             # The card has been declined
@@ -101,6 +103,7 @@ class StripeFormViewMixin(object):
                     e.http_status,
                 )
             )
+            result = HttpResponseRedirect(self.object.url_failure)
         except stripe.StripeError as e:
             self.object.set_payment_failed()
             logger.error(
@@ -113,4 +116,5 @@ class StripeFormViewMixin(object):
                     e.http_status,
                 )
             )
-        return super(StripeFormViewMixin, self).form_valid(form)
+            result = HttpResponseRedirect(self.object.url_failure)
+        return result

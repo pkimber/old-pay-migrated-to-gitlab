@@ -82,6 +82,10 @@ class Payment(TimeStampedModel):
         max_length=100,
         help_text='redirect to this location after payment.'
     )
+    url_failure = models.CharField(
+        max_length=100,
+        help_text='redirect to this location if the payment fails.'
+    )
     # link to the object in the system which requested the payment
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()

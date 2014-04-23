@@ -39,6 +39,7 @@ class TestPayment(TestCase):
             Decimal('10.00'),
             line,
             '/url/after/',
+            '/url/fail/',
         )
 
     def test_make_payment(self):
@@ -88,7 +89,8 @@ class TestPayment(TestCase):
             2,
             Decimal('1.32'),
             line,
-            '/url/after/'
+            '/url/after/',
+            '/url/fail/',
         )
         self.assertEqual(Decimal('2.64'), payment.total)
 
