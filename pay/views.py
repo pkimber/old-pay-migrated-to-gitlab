@@ -87,12 +87,30 @@ class StripeFormViewMixin(object):
         except stripe.CardError as e:
             self.object.set_payment_failed()
             # The card has been declined
-            body = e.json_body
-            err  = body['error']
-            print("Status is: %s" % e.http_status)
-            print("Type is: %s" % err['type'])
-            print("Code is: %s" % err['code'])
-            # param is '' in this case
-            print("Param is: %s" % err['param'])
-            print("Message is: %s" % err['message'])
+            logger.error(
+                'CardError\n'
+                'payment: {}\n'
+                'param: {}\n'
+                'code: {}\n'
+                'http body: {}\n'
+                'http status: {}'.format(
+                    self.object.pk,
+                    e.param,
+                    e.code,
+                    e.http_body,
+                    e.http_status,
+                )
+            )
+        except stripe.StripeError as e:
+            self.object.set_payment_failed()
+            logger.error(
+                'StripeError\n'
+                'payment: {}\n'
+                'http body: {}\n'
+                'http status: {}'.format(
+                    self.object.pk,
+                    e.http_body,
+                    e.http_status,
+                )
+            )
         return super(StripeFormViewMixin, self).form_valid(form)
