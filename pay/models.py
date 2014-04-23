@@ -68,6 +68,7 @@ reversion.register(PaymentState)
 class Payment(TimeStampedModel):
     """List of payments."""
 
+    name = models.TextField()
     email = models.EmailField()
     product = models.ForeignKey(Product)
     title = models.CharField(max_length=100)

@@ -11,16 +11,21 @@ class Migration(SchemaMigration):
         # Adding model 'StripeCustomer'
         db.create_table('pay_stripecustomer', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(blank=True, auto_now_add=True)),
+            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
             ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
             ('email', self.gf('django.db.models.fields.EmailField')(max_length=75, unique=True)),
             ('customer_id', self.gf('django.db.models.fields.TextField')()),
         ))
         db.send_create_signal('pay', ['StripeCustomer'])
 
+        # Adding field 'Payment.name'
+        db.add_column('pay_payment', 'name',
+                      self.gf('django.db.models.fields.TextField')(default=''),
+                      keep_default=False)
+
         # Adding field 'Payment.url_failure'
         db.add_column('pay_payment', 'url_failure',
-                      self.gf('django.db.models.fields.CharField')(max_length=100, default='/payment/sorry/'),
+                      self.gf('django.db.models.fields.CharField')(max_length=100, default=''),
                       keep_default=False)
 
 
@@ -28,13 +33,16 @@ class Migration(SchemaMigration):
         # Deleting model 'StripeCustomer'
         db.delete_table('pay_stripecustomer')
 
+        # Deleting field 'Payment.name'
+        db.delete_column('pay_payment', 'name')
+
         # Deleting field 'Payment.url_failure'
         db.delete_column('pay_payment', 'url_failure')
 
 
     models = {
         'contenttypes.contenttype': {
-            'Meta': {'object_name': 'ContentType', 'unique_together': "(('app_label', 'model'),)", 'ordering': "('name',)", 'db_table': "'django_content_type'"},
+            'Meta': {'db_table': "'django_content_type'", 'object_name': 'ContentType', 'unique_together': "(('app_label', 'model'),)", 'ordering': "('name',)"},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -43,10 +51,11 @@ class Migration(SchemaMigration):
         'pay.payment': {
             'Meta': {'object_name': 'Payment', 'unique_together': "(('object_id', 'content_type'),)", 'ordering': "('pk',)"},
             'content_type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['contenttypes.ContentType']"}),
-            'created': ('django.db.models.fields.DateTimeField', [], {'blank': 'True', 'auto_now_add': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'name': ('django.db.models.fields.TextField', [], {}),
             'object_id': ('django.db.models.fields.PositiveIntegerField', [], {}),
             'price': ('django.db.models.fields.DecimalField', [], {'decimal_places': '2', 'max_digits': '8'}),
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['pay.Product']"}),
@@ -58,7 +67,7 @@ class Migration(SchemaMigration):
         },
         'pay.paymentstate': {
             'Meta': {'object_name': 'PaymentState', 'ordering': "('name',)"},
-            'created': ('django.db.models.fields.DateTimeField', [], {'blank': 'True', 'auto_now_add': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -66,7 +75,7 @@ class Migration(SchemaMigration):
         },
         'pay.product': {
             'Meta': {'object_name': 'Product', 'ordering': "('slug',)"},
-            'created': ('django.db.models.fields.DateTimeField', [], {'blank': 'True', 'auto_now_add': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'description': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
@@ -76,7 +85,7 @@ class Migration(SchemaMigration):
         },
         'pay.stripecustomer': {
             'Meta': {'object_name': 'StripeCustomer', 'ordering': "('pk',)"},
-            'created': ('django.db.models.fields.DateTimeField', [], {'blank': 'True', 'auto_now_add': 'True'}),
+            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'customer_id': ('django.db.models.fields.TextField', [], {}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'unique': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),

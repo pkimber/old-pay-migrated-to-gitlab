@@ -32,6 +32,7 @@ class TestPayment(TestCase):
 
     def _make_payment(self, line):
         return make_payment(
+            'Mr Patrick Kimber',
             'test@pkimber.net',
             self.pencil,
             'Colour pencils',
@@ -83,6 +84,7 @@ class TestPayment(TestCase):
     def test_total(self):
         line = make_sales_ledger('Carol')
         payment = make_payment(
+            'Carol C',
             'test@pkimber.net',
             self.pencil,
             'Colour pencils',

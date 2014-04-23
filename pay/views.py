@@ -58,18 +58,18 @@ class StripeFormViewMixin(object):
             logger.critical('payment check: invalid')
             raise PermissionDenied('Valid payment check failed.')
 
-    def _init_stripe_customer(self, email, token):
+    def _init_stripe_customer(self, name, email, token):
         """Make sure a stripe customer is created and update card (token)."""
         result = None
         try:
             c = StripeCustomer.objects.get(email=email)
-            self._stripe_customer_update(c.customer_id, token)
+            self._stripe_customer_update(c.customer_id, name, token)
             result = c.customer_id
         except StripeCustomer.DoesNotExist:
-            customer = self._stripe_customer_create(email, token)
+            customer = self._stripe_customer_create(name, email, token)
             c = StripeCustomer(**dict(
-                email=email,
                 customer_id=customer.id,
+                email=email,
             ))
             c.save()
             result = c.customer_id
@@ -103,21 +103,23 @@ class StripeFormViewMixin(object):
             )
         )
 
-    def _stripe_customer_create(self, email, token):
+    def _stripe_customer_create(self, name, email, token):
         """Use the Stripe API to create/update a customer."""
         try:
             return stripe.Customer.create(
                 card=token,
+                description=name,
                 email=email,
             )
         except stripe.StripeError as e:
             self._log_stripe_error(e, 'create - email: {}'.format(email))
 
-    def _stripe_customer_update(self, customer_id, token):
+    def _stripe_customer_update(self, customer_id, name, token):
         """Use the Stripe API to create/update a customer."""
         try:
             customer = stripe.Customer.retrieve(customer_id)
             customer.card = token
+            customer.description = name
             customer.save()
         except stripe.StripeError as e:
             self._log_stripe_error(e, 'update - id: {}'.format(customer_id))
@@ -145,7 +147,9 @@ class StripeFormViewMixin(object):
         # in production.  See your keys here https://manage.stripe.com/account
         stripe.api_key = settings.STRIPE_SECRET_KEY
         try:
-            customer_id = self._init_stripe_customer(self.object.email, token)
+            customer_id = self._init_stripe_customer(
+                self.object.name, self.object.email, token
+            )
             stripe.Charge.create(
                 amount=self.object.total_as_pennies(), # amount in pennies, again
                 currency=CURRENCY,

@@ -14,6 +14,7 @@ from example.tests.model_maker import make_sales_ledger
 def default_scenario_pay():
     pencil = make_product('Pencil', 'pencil', Decimal('1.32'))
     make_payment(
+        'Mr Patrick Kimber',
         'test@pkimber.net',
         pencil,
         'Colour pencils',
@@ -24,6 +25,7 @@ def default_scenario_pay():
         '/url/fail/',
     )
     make_payment(
+        'Mrs A Kimber',
         'a@pkimber.net',
         pencil,
         'Pencils',

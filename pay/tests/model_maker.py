@@ -13,9 +13,10 @@ from pay.models import (
 
 
 def make_payment(
-        email, product, title, quantity, price,
+        name, email, product, title, quantity, price,
         content_object, url, url_failure, **kwargs):
     defaults = dict(
+        name=name,
         email=email,
         product=product,
         title=title,
