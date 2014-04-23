@@ -75,7 +75,7 @@ class StripeFormViewMixin(object):
             result = c.customer_id
         return result
 
-    def _log_card_error(self, payment_pk):
+    def _log_card_error(self, e, payment_pk):
         logger.error(
             'CardError\n'
             'payment: {}\n'
@@ -146,7 +146,7 @@ class StripeFormViewMixin(object):
         stripe.api_key = settings.STRIPE_SECRET_KEY
         try:
             customer_id = self._init_stripe_customer(self.object.email, token)
-            charge = stripe.Charge.create(
+            stripe.Charge.create(
                 amount=self.object.total_as_pennies(), # amount in pennies, again
                 currency=CURRENCY,
                 customer=customer_id,
