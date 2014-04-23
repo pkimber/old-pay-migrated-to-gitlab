@@ -1,12 +1,12 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 from django.db import IntegrityError
 from django.test import TestCase
+from django.utils import timezone
 
 from base.tests.model_maker import clean_and_save
 
@@ -68,7 +68,7 @@ class TestPayment(TestCase):
         """This should never happen... but test anyway."""
         line = make_sales_ledger('Carol')
         payment = self._make_payment(line)
-        payment.created = datetime.now() + relativedelta(hours=+1)
+        payment.created = timezone.now() + relativedelta(hours=+1)
         payment.save()
         self.assertRaises(
             PayError,
@@ -78,7 +78,7 @@ class TestPayment(TestCase):
     def test_check_can_pay_too_late(self):
         line = make_sales_ledger('Carol')
         payment = self._make_payment(line)
-        payment.created = datetime.now() + relativedelta(hours=-1)
+        payment.created = timezone.now() + relativedelta(hours=-1)
         payment.save()
         self.assertRaises(
             PayError,
