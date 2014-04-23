@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from datetime import datetime
 from decimal import Decimal
 
 from django.contrib.contenttypes import generic
@@ -115,6 +116,13 @@ class Payment(TimeStampedModel):
             raise PayError(
                 'Cannot pay this transaction (it is not due or '
                 'failed earlier) [{}]'.format(self.pk)
+            )
+        td = datetime.now() - self.created
+        diff = td.days * 1440 + td.seconds / 60
+        if abs(diff) > 5:
+            raise PayError(
+                'Cannot pay this transaction. '
+                'It is too old (or has travelled in time).'
             )
 
     def is_paid(self):
