@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.core.management.base import BaseCommand
 
-from pay.tests.scenario import init_app_pay
+from pay.service import init_app_pay
 
 
 class Command(BaseCommand):

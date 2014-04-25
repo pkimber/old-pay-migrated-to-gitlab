@@ -19,10 +19,11 @@ from pay.tests.model_maker import (
     make_payment,
     make_product,
 )
-from pay.tests.scenario import init_app_pay
+from pay.service import init_app_pay
 
 from example.models import SalesLedger
 from example.tests.model_maker import make_sales_ledger
+
 
 class TestPayment(TestCase):
 
@@ -83,6 +84,18 @@ class TestPayment(TestCase):
         self.assertRaises(
             PayError,
             payment.check_can_pay
+        )
+
+    def test_mail_template_context(self):
+        line = make_sales_ledger('Carol')
+        payment = self._make_payment(line)
+        self.assertEqual(
+            dict(
+                description='Colour pencils (1 x £10.00)',
+                name='Mr Patrick Kimber',
+                total='£10.00',
+            ),
+            payment.mail_template_context(),
         )
 
     def test_make_payment(self):

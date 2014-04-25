@@ -128,6 +128,13 @@ class Payment(TimeStampedModel):
     def is_paid(self):
         return self.state.slug == PaymentState.PAID
 
+    def mail_template_context(self):
+        return dict(
+            description=self.description,
+            name=self.name,
+            total='£{:.2f}'.format(self.total),
+        )
+
     def save_token(self, token):
         self.check_can_pay()
         self.token = token

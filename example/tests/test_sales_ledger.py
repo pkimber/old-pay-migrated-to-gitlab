@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 from django.test import TestCase
 
 from pay.models import Payment
+from pay.service import init_app_pay
 from pay.tests.helper import check_payment
-from pay.tests.scenario import init_app_pay
 
 from example.tests.scenario import default_scenario_pay
 

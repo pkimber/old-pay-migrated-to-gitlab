@@ -8,6 +8,10 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 
+from mail.service import (
+    mail_template_render,
+    queue_mail,
+)
 #from paypal.standard.forms import PayPalPaymentsForm
 
 from .forms import StripeForm
@@ -15,6 +19,7 @@ from .models import (
     Payment,
     StripeCustomer,
 )
+from .service import PAYMENT_THANKYOU
 
 
 CURRENCY = 'GBP'
@@ -157,6 +162,10 @@ class StripeFormViewMixin(object):
                 description=self.object.description,
             )
             self.object.set_paid()
+            subject, description = mail_template_render(
+                PAYMENT_THANKYOU, self.object.mail_template_context()
+            )
+            queue_mail(self.object, [self.object.email,], subject, description)
             result = super(StripeFormViewMixin, self).form_valid(form)
         except stripe.CardError as e:
             self.object.set_payment_failed()

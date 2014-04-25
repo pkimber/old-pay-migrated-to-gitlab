@@ -10,7 +10,7 @@ from login.tests.scenario import (
 )
 
 from pay.models import Payment
-from pay.tests.scenario import init_app_pay
+from pay.service import init_app_pay
 from pay.views import PAYMENT_PK
 
 from example.tests.scenario import default_scenario_pay
