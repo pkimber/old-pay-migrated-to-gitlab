@@ -28,7 +28,7 @@ setup(
             'templates/pay/*.*',
         ],
     },
-    version='0.0.07',
+    version='0.0.08',
     description='pay',
     author='Patrick Kimber',
     author_email='code@pkimber.net',
