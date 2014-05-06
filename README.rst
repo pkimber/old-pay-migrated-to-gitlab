@@ -4,6 +4,8 @@ Payment
 Django application for an online payment.
 
 For notes:
+https://django-dev-and-deploy-using-salt.readthedocs.org/en/latest/app-pay.html
+and
 https://github.com/pkimber/docs/blob/master/source/paypal.rst
 
 Install
@@ -12,48 +14,38 @@ Install
 Virtual Environment
 -------------------
 
-.. note:: Replace ``patrick`` with your name (check in the ``settings`` folder
-          to make sure a file has been created for you).
+::
 
-.. note:: Replace ``your_stripe_publish_key`` with your Stripe *Publishable* key.
+  pyvenv-3.4 --without-pip venv-pay
+  source venv-pay/bin/activate
+  wget https://raw.githubusercontent.com/pypa/pip/master/contrib/get-pip.py
+  python get-pip.py
 
-  mkvirtualenv dev_pay
   pip install -r requirements/local.txt
-
-  echo "export DJANGO_SETTINGS_MODULE=example.dev_patrick" >> $VIRTUAL_ENV/bin/postactivate
-  echo "unset DJANGO_SETTINGS_MODULE" >> $VIRTUAL_ENV/bin/postdeactivate
-
-  echo "export PAYPAL_RECEIVER_EMAIL=\"merchant@pkimber.net\"" >> $VIRTUAL_ENV/bin/postactivate
-  echo "unset PAYPAL_RECEIVER_EMAIL" >> $VIRTUAL_ENV/bin/postdeactivate
-
-  echo "export STRIPE_PUBLISH_KEY=\"your_stripe_publish_key\"" >> $VIRTUAL_ENV/bin/postactivate
-  echo "unset STRIPE_PUBLISH_KEY" >> $VIRTUAL_ENV/bin/postdeactivate
-
-  echo "export STRIPE_SECRET_KEY=\"your_stripe_secret_key\"" >> $VIRTUAL_ENV/bin/postactivate
-  echo "unset STRIPE_SECRET_KEY" >> $VIRTUAL_ENV/bin/postdeactivate
-
-  add2virtualenv .
-  deactivate
 
 Testing
 =======
 
-Using ``pytest-django``::
+::
 
-  workon dev_pay
   find . -name '*.pyc' -delete
-  py.test
-
-To stop on first failure::
-
   py.test -x
 
 Usage
 =====
 
+.. note::
+
+  Replace ``your_stripe_publish_key`` and ``your_stripe_secret_key`` with the
+  test versions of the *publishable* and *secret* key.
+
 ::
 
-  workon dev_pay
+  export PAYPAL_RECEIVER_EMAIL="merchant@pkimber.net"
+  export STRIPE_PUBLISH_KEY="your_stripe_publish_key"
+  export STRIPE_SECRET_KEY="your_stripe_secret_key"
+
+::
 
   py.test -x && \
       touch temp.db && rm temp.db && \
@@ -67,4 +59,4 @@ Usage
 Release
 =======
 
-https://github.com/pkimber/docs
+https://django-dev-and-deploy-using-salt.readthedocs.org/
