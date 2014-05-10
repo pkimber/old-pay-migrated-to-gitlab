@@ -4,7 +4,6 @@
 -e ../login
 -e ../mail
 beautifulsoup4
-fabric
 gitpython
 hgapi
 ipdb
