@@ -45,7 +45,7 @@ def init_app_pay():
     )
 
 
-def init_product(slug, title, description, price):
+def init_product(title, slug, description, price):
     """Create a new product - if it doesn't exist."""
     slug = slugify(slug)
     try:
@@ -55,6 +55,6 @@ def init_product(slug, title, description, price):
     except Product.DoesNotExist:
         if not description:
             description = ''
-        result = make_product(slug, title, price, description=description)
+        result = make_product(title, slug, price, description=description)
         #print('make_product("{}")'.format(title))
     return result

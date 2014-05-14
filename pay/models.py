@@ -28,12 +28,18 @@ class PayError(Exception):
 
 
 class Product(TimeStampedModel):
-    """List of products and their price."""
+    """List of products and their price.
+
+    The 'bundle' field allows us to build a bundle of products
+    e.g. a pack of pencils + pens for a cheaper price than buying them
+    separately.
+    """
 
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
+    bundle = models.ForeignKey('self', blank=True, null=True)
 
     class Meta:
         ordering = ('slug',)
@@ -42,6 +48,10 @@ class Product(TimeStampedModel):
 
     def __str__(self):
         return '{}'.format(self.title)
+
+    def _is_bundle(self):
+        return bool(self.product_set.count())
+    is_bundle = property(_is_bundle)
 
 reversion.register(Product)
 

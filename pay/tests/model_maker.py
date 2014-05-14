@@ -39,7 +39,7 @@ def make_payment_state(name, slug, **kwargs):
     return clean_and_save(PaymentState(**defaults))
 
 
-def make_product(slug, title, price, **kwargs):
+def make_product(title, slug, price, **kwargs):
     defaults = dict(
         title=title,
         slug=slugify(slug),
