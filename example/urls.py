@@ -12,6 +12,8 @@ from django.views.generic import RedirectView
 from pay.views import pay_later_view
 
 from .views import (
+    ExampleCheckout,
+    ExamplePaymentDetailView,
     HomeView,
     StripeUpdateView,
 )
@@ -34,6 +36,14 @@ urlpatterns = patterns(
     url(r'^home/user/$',
         view=RedirectView.as_view(url=reverse_lazy('project.home')),
         name='project.home.user'
+        ),
+    url(regex=r'^example/checkout/(?P<pk>\d+)/$',
+        view=ExampleCheckout.as_view(),
+        name='example.checkout'
+        ),
+    url(regex=r'^example/payment/(?P<pk>\d+)/$',
+        view=ExamplePaymentDetailView.as_view(),
+        name='example.payment'
         ),
     url(regex=r'^later/(?P<pk>\d+)/$',
         view=pay_later_view,

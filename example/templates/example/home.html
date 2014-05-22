@@ -17,20 +17,22 @@
           <thead>
             <tr>
               <th>Title</th>
-              <th>Quantity</th>
+              <th>Product</th>
               <th>Price</th>
+              <th>Quantity</th>
             </tr>
           </thead>
           <tbody>
             {% for p in object_list %}
               <tr valign="top">
                 <td>
-                  <a href="{% url 'pay.stripe' p.pk %}">
+                  <a href="{% url 'example.checkout' p.pk %}">
                     {{ p.title }}
                   </a>
                 </td>
+                <td>{{ p.product.title }}</td>
+                <td>{{ p.product.price }}</td>
                 <td>{{ p.quantity }}</td>
-                <td>{{ p.price }}</td>
               </tr>
             {% endfor %}
           </tbody>

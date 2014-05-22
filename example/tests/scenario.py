@@ -13,25 +13,5 @@ from example.tests.model_maker import make_sales_ledger
 
 def default_scenario_pay():
     pencil = make_product('Pencil', 'pencil', Decimal('1.32'))
-    make_payment(
-        'Mr Patrick Kimber',
-        'test@pkimber.net',
-        pencil,
-        'Colour pencils',
-        1,
-        Decimal('10.00'),
-        make_sales_ledger('Carol'),
-        '/url/after/',
-        '/url/fail/',
-    )
-    make_payment(
-        'Mrs A Kimber',
-        'a@pkimber.net',
-        pencil,
-        'Pencils',
-        2,
-        Decimal('2.50'),
-        make_sales_ledger('Andi'),
-        '/url/after/',
-        '/url/fail/',
-    )
+    make_sales_ledger('test@pkimber.net', 'Carol', pencil, 2)
+    make_sales_ledger('test@pkimber.net', 'Andi', pencil, 1)

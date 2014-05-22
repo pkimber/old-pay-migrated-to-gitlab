@@ -48,7 +48,7 @@ class TestPayment(TestCase):
         )
 
     def test_check_can_pay(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = self._make_payment(line)
         try:
             payment.check_can_pay()
@@ -57,7 +57,7 @@ class TestPayment(TestCase):
             self.fail('payment is due - so can be paid')
 
     def test_check_can_pay_not(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = self._make_payment(line)
         payment.set_paid()
         self.assertRaises(
@@ -67,7 +67,7 @@ class TestPayment(TestCase):
 
     def test_check_can_pay_too_early(self):
         """This should never happen... but test anyway."""
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = self._make_payment(line)
         payment.created = timezone.now() + relativedelta(hours=+1)
         payment.save()
@@ -77,7 +77,7 @@ class TestPayment(TestCase):
         )
 
     def test_check_can_pay_too_late(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = self._make_payment(line)
         payment.created = timezone.now() + relativedelta(hours=-1)
         payment.save()
@@ -87,7 +87,7 @@ class TestPayment(TestCase):
         )
 
     def test_mail_template_context(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = self._make_payment(line)
         self.assertEqual(
             dict(
@@ -99,7 +99,7 @@ class TestPayment(TestCase):
         )
 
     def test_make_payment(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         self._make_payment(line)
 
     def test_no_content_object(self):
@@ -114,7 +114,7 @@ class TestPayment(TestCase):
         )
 
     def test_set_paid(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         self.assertFalse(line.is_paid)
         payment = self._make_payment(line)
         self.assertFalse(payment.is_paid())
@@ -125,7 +125,7 @@ class TestPayment(TestCase):
         self.assertTrue(line.is_paid)
 
     def test_set_payment_failed(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         self.assertFalse(line.is_paid)
         payment = self._make_payment(line)
         self.assertFalse(payment.is_paid())
@@ -137,7 +137,7 @@ class TestPayment(TestCase):
         self.assertEqual(PaymentState.FAIL, payment.state.slug)
 
     def test_total(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = make_payment(
             'Carol C',
             'test@pkimber.net',
@@ -152,7 +152,7 @@ class TestPayment(TestCase):
         self.assertEqual(Decimal('2.64'), payment.total)
 
     def test_unique_together(self):
-        line = make_sales_ledger('Carol')
+        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         self._make_payment(line)
         self.assertRaises(
             IntegrityError,

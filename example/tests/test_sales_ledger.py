@@ -18,6 +18,6 @@ class TestSalesLedger(TestCase):
         default_scenario_pay()
 
     def test_link_to_payment(self):
-        payment = Payment.objects.get(email='test@pkimber.net')
         sales_ledger = SalesLedger.objects.get(title='Andi')
+        payment = sales_ledger.create_payment()
         check_payment(sales_ledger)
