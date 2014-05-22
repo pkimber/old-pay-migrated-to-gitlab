@@ -30,13 +30,3 @@ class SalesLedger(models.Model):
     def is_paid(self):
         paid = PaymentState.objects.get(slug=PaymentState.PAID)
         return self.payment_state == paid
-
-    def set_paid(self):
-        paid = PaymentState.objects.get(slug=PaymentState.PAID)
-        self.payment_state = paid
-        self.save()
-
-    def set_payment_failed(self):
-        fail = PaymentState.objects.get(slug=PaymentState.FAIL)
-        self.payment_state = fail
-        self.save()
