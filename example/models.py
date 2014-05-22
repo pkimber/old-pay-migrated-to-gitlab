@@ -3,12 +3,20 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+from pay.models import (
+    default_payment_state,
+    PaymentState,
+)
+
 
 class SalesLedger(models.Model):
     """List of prices."""
 
     title = models.CharField(max_length=100)
-    is_paid = models.BooleanField(default=False)
+    payment_state = models.ForeignKey(
+        PaymentState,
+        default=default_payment_state,
+    )
 
     class Meta:
         ordering = ('title',)
@@ -17,6 +25,11 @@ class SalesLedger(models.Model):
 
     def __str__(self):
         return '{}'.format(self.title)
+
+    @property
+    def is_paid(self):
+        paid = PaymentState.objects.get(slug=PaymentState.PAID)
+        return self.payment_state == paid
 
     def set_paid(self):
         self.is_paid = True

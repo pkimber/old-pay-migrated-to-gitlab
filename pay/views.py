@@ -7,6 +7,8 @@ import stripe
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
+from django.views.decorators.http import require_POST
+from django.views.generic import UpdateView
 
 from mail.service import (
     mail_template_render,
@@ -19,7 +21,10 @@ from .models import (
     Payment,
     StripeCustomer,
 )
-from .service import PAYMENT_THANKYOU
+from .service import (
+    PAYMENT_LATER,
+    PAYMENT_THANKYOU,
+)
 
 
 CURRENCY = 'GBP'
@@ -45,23 +50,38 @@ logger = logging.getLogger(__name__)
 #        )
 
 
+def _check_perm(request, payment):
+    """Check the session variable to make sure it was set."""
+    payment_pk = request.session.get(PAYMENT_PK, None)
+    if payment_pk:
+        if not payment_pk == payment.pk:
+            logger.critical(
+                'payment check: invalid {} != {}'.format(
+                    payment_pk, payment.pk,
+            ))
+            raise PermissionDenied('Valid payment check fail.')
+    else:
+        logger.critical('payment check: invalid')
+        raise PermissionDenied('Valid payment check failed.')
+
+
+@require_POST
+def pay_later_view(request, pk):
+    payment = Payment.objects.get(pk=pk)
+    _check_perm(request, payment)
+    payment.check_can_pay()
+    payment.set_pay_later()
+    subject, description = mail_template_render(
+        PAYMENT_LATER, payment.mail_template_context()
+    )
+    queue_mail(payment, [payment.email,], subject, description)
+    return HttpResponseRedirect(payment.url)
+
+
 class StripeFormViewMixin(object):
 
     form_class = StripeForm
     model = Payment
-
-    def _check_perm(self):
-        payment_pk = self.request.session.get(PAYMENT_PK, None)
-        if payment_pk:
-            if not payment_pk == self.object.pk:
-                logger.critical(
-                    'payment check: invalid {} != {}'.format(
-                        payment_pk, self.object.pk,
-                ))
-                raise PermissionDenied('Valid payment check fail.')
-        else:
-            logger.critical('payment check: invalid')
-            raise PermissionDenied('Valid payment check failed.')
 
     def _init_stripe_customer(self, name, email, token):
         """Make sure a stripe customer is created and update card (token)."""
@@ -131,7 +151,7 @@ class StripeFormViewMixin(object):
 
     def get_context_data(self, **kwargs):
         context = super(StripeFormViewMixin, self).get_context_data(**kwargs)
-        self._check_perm()
+        _check_perm(self.request, self.object)
         self.object.check_can_pay()
         context.update(dict(
             currency=CURRENCY,
@@ -176,3 +196,6 @@ class StripeFormViewMixin(object):
             self._log_stripe_error(e, 'payment: {}'.format(self.object.pk))
             result = HttpResponseRedirect(self.object.url_failure)
         return result
+
+    def get_success_url(self):
+        return self.object.url

@@ -9,6 +9,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
 
+from pay.views import pay_later_view
+
 from .views import (
     HomeView,
     StripeUpdateView,
@@ -32,6 +34,10 @@ urlpatterns = patterns(
     url(r'^home/user/$',
         view=RedirectView.as_view(url=reverse_lazy('project.home')),
         name='project.home.user'
+        ),
+    url(regex=r'^later/(?P<pk>\d+)/$',
+        view=pay_later_view,
+        name='pay.later'
         ),
     url(regex=r'^stripe/(?P<pk>\d+)/$',
         view=StripeUpdateView.as_view(),

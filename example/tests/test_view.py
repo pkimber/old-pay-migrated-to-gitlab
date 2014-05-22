@@ -17,6 +17,10 @@ from example.tests.scenario import default_scenario_pay
 
 
 class TestView(TestCase):
+    """
+    Session variables difficult to test ref:
+    http://stackoverflow.com/questions/4453764/how-do-i-modify-the-session-in-the-django-test-framework
+    """
 
     def setUp(self):
         init_app_pay()
@@ -28,17 +32,27 @@ class TestView(TestCase):
             password=self.web.username
         )
 
+    def _set_session_payment_pk(self, pk):
+        session = self.client.session
+        session[PAYMENT_PK] = pk
+        session.save()
+
+    def test_pay_later(self):
+        payment = Payment.objects.get(email='test@pkimber.net')
+        self._set_session_payment_pk(payment.pk)
+        response = self.client.post(
+            reverse('pay.later', kwargs=dict(pk=payment.pk))
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/url/after/', response.url)
+
     def test_project_home(self):
         response = self.client.get(reverse('project.home'))
         self.assertEqual(response.status_code, 200)
 
     def test_stripe(self):
         payment = Payment.objects.get(email='test@pkimber.net')
-        # Session variables difficult to test ref:
-        # http://stackoverflow.com/questions/4453764/how-do-i-modify-the-session-in-the-django-test-framework
-        session = self.client.session
-        session[PAYMENT_PK] = payment.pk
-        session.save()
+        self._set_session_payment_pk(payment.pk)
         response = self.client.get(
             reverse('pay.stripe', kwargs=dict(pk=payment.pk))
         )

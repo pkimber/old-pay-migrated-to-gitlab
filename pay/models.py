@@ -60,6 +60,7 @@ class PaymentState(TimeStampedModel):
 
     DUE = 'due'
     FAIL = 'fail'
+    LATER ='later'
     PAID = 'paid'
 
     name = models.CharField(max_length=100)
@@ -117,6 +118,13 @@ class Payment(TimeStampedModel):
         return '{} ({} x £{:.2f})'.format(self.title, self.quantity, self.price)
     description = property(_description)
 
+    def _set_payment_state(self, payment_state):
+        """Mirror payment state to content object (to make queries easy)."""
+        self.state = payment_state
+        self.save()
+        self.content_object.payment_state = payment_state
+        self.content_object.save()
+
     def _total(self):
         return self.price * self.quantity
     total = property(_total)
@@ -151,14 +159,16 @@ class Payment(TimeStampedModel):
         self.save()
 
     def set_paid(self):
-        self.state = PaymentState.objects.get(slug=PaymentState.PAID)
-        self.content_object.set_paid()
-        self.save()
+        payment_state = PaymentState.objects.get(slug=PaymentState.PAID)
+        self._set_payment_state(payment_state)
 
     def set_payment_failed(self):
-        self.state = PaymentState.objects.get(slug=PaymentState.FAIL)
-        self.content_object.set_payment_failed()
-        self.save()
+        payment_state = PaymentState.objects.get(slug=PaymentState.FAIL)
+        self._set_payment_state(payment_state)
+
+    def set_pay_later(self):
+        payment_state = PaymentState.objects.get(slug=PaymentState.LATER)
+        self._set_payment_state(payment_state)
 
     def total_as_pennies(self):
         return int(self.total * Decimal('100'))
