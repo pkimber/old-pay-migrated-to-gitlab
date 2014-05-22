@@ -47,11 +47,11 @@ urlpatterns = patterns(
         ),
     url(regex=r'^later/(?P<pk>\d+)/$',
         view=pay_later_view,
-        name='pay.later'
+        name='example.pay.later'
         ),
     url(regex=r'^stripe/(?P<pk>\d+)/$',
         view=StripeUpdateView.as_view(),
-        name='pay.stripe'
+        name='example.pay.stripe'
         ),
 )
 

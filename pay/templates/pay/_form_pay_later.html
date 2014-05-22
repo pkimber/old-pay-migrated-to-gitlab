@@ -1,9 +1,0 @@
-<form class="flexform bluebox" action="{% url 'web.payment.later' object.pk %}" method="POST">
-  {% csrf_token %}
-  <p>
-    To pay by cheque or with a payment plan:
-  </p>
-  <p>
-    <input type="submit" value="Pay Later" />
-  </p>
-</form>

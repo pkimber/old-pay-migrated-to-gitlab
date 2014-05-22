@@ -25,7 +25,7 @@ class SalesLedger(models.Model):
     )
 
     class Meta:
-        ordering = ('title',)
+        ordering = ('pk',)
         verbose_name = 'Sales ledger'
         verbose_name_plural = 'Sales ledger'
 
@@ -48,3 +48,7 @@ class SalesLedger(models.Model):
         paid = PaymentState.objects.get(slug=PaymentState.PAID)
         return self.payment_state == paid
 
+    @property
+    def can_pay(self):
+        due = PaymentState.objects.get(slug=PaymentState.DUE)
+        return self.payment_state == due

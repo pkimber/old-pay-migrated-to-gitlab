@@ -58,7 +58,7 @@ class TestView(TestCase):
     def test_pay_later(self):
         self._set_session_payment_pk(self.payment.pk)
         response = self.client.post(
-            reverse('pay.later', kwargs=dict(pk=self.payment.pk))
+            reverse('example.pay.later', kwargs=dict(pk=self.payment.pk))
         )
         self.assertEqual(response.status_code, 302)
         self.assertIn('/example/payment/', response.url)
@@ -71,6 +71,6 @@ class TestView(TestCase):
         #payment = Payment.objects.get(email='test@pkimber.net')
         self._set_session_payment_pk(self.payment.pk)
         response = self.client.get(
-            reverse('pay.stripe', kwargs=dict(pk=self.payment.pk))
+            reverse('example.pay.stripe', kwargs=dict(pk=self.payment.pk))
         )
         self.assertEqual(response.status_code, 200)
