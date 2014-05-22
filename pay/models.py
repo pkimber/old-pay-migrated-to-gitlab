@@ -143,6 +143,13 @@ class Payment(TimeStampedModel):
                 'It is too old (or has travelled in time).'
             )
 
+    def check_can_pay_later(self):
+        if not self.state.slug == PaymentState.LATER:
+            raise PayError(
+                'Cannot pay this transaction (it is not due to '
+                'be paid later) [{}]'.format(self.pk)
+            )
+
     def is_paid(self):
         return self.state.slug == PaymentState.PAID
 
