@@ -39,7 +39,9 @@ class Product(TimeStampedModel):
     slug = models.SlugField(unique=True)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    bundle = models.ForeignKey('self', blank=True, null=True)
+    bundle = models.ManyToManyField(
+        'self', blank=True, null=True, symmetrical=False
+    )
 
     class Meta:
         ordering = ('slug',)
@@ -49,9 +51,9 @@ class Product(TimeStampedModel):
     def __str__(self):
         return '{}'.format(self.title)
 
-    def _is_bundle(self):
-        return bool(self.product_set.count())
-    is_bundle = property(_is_bundle)
+    @property
+    def is_bundle(self):
+        return bool(self.bundle.count())
 
 reversion.register(Product)
 

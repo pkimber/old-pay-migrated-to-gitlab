@@ -15,7 +15,7 @@ def check_payment(model_instance):
     payment.url = reverse('project.home')
     payment.url_failure = reverse('project.home')
     clean_and_save(payment)
-    # can the generic content can be paid?
+    # can the generic content be paid?
     paid = PaymentState.objects.get(slug=PaymentState.PAID)
     current = model_instance.payment_state
     model_instance.payment_state = paid
