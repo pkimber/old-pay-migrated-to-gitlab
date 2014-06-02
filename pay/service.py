@@ -7,12 +7,14 @@ from mail.service import init_mail_template
 from pay.models import (
     PaymentState,
     Product,
+    ProductBundle,
     ProductCategory,
     ProductType,
 )
 from pay.tests.model_maker import (
     make_payment_state,
     make_product,
+    make_product_bundle,
     make_product_category,
     make_product_type,
 )
@@ -75,6 +77,30 @@ def init_product(title, slug, description, price, product_category, **kwargs):
         kwargs.update(dict(description=description))
         result = make_product(title, slug, price, product_category, **kwargs)
     return result
+
+
+def init_product_bundle(name, slug, product, price, **kwargs):
+    slug = slugify(slug)
+    try:
+        result = ProductBundle.objects.get(slug=slug)
+        # If the product exists - don't update it!!!
+        # The user might have set a new price or description!!
+    except ProductBundle.DoesNotExist:
+        result = make_product_bundle(name, slug, product, price, **kwargs)
+    return result
+
+
+def init_product_bundle_add_product(product_bundle, products):
+    """If a product has not been added to the bundle, then add it.
+
+    TODO When the system is live, I don't think we need this function as we
+    will have editing screens to add products to bundles.
+    """
+    for p in products:
+        try:
+            product_bundle.bundle.get(slug=p.slug)
+        except Product.DoesNotExist:
+            product_bundle.bundle.add(p)
 
 
 def init_product_category(name, slug, product_type):

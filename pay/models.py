@@ -75,9 +75,9 @@ class Product(TimeStampedModel):
     category = models.ForeignKey(ProductCategory)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    bundle = models.ManyToManyField(
-        'self', blank=True, null=True, symmetrical=False
-    )
+    #bundle = models.ManyToManyField(
+    #    'self', blank=True, null=True, symmetrical=False
+    #)
     # option to hide legacy products
     legacy = models.BooleanField(default=False)
 
@@ -89,11 +89,39 @@ class Product(TimeStampedModel):
     def __str__(self):
         return '{}'.format(self.name)
 
-    @property
-    def is_bundle(self):
-        return bool(self.bundle.count())
+    #@property
+    #def is_bundle(self):
+    #    return bool(self.bundle.count())
 
 reversion.register(Product)
+
+
+class ProductBundle(TimeStampedModel):
+    """If a product is selected... then display the 'bundle' of products.
+
+    If a product is selected, then these are the bundles to display.
+    """
+
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    product = models.ForeignKey(Product, related_name='+')
+    price = models.DecimalField(max_digits=8, decimal_places=2)
+    bundle = models.ManyToManyField(Product, related_name='bundles')
+
+    #product = models.ForeignKey(Product)
+    #    'self', blank=True, null=True, symmetrical=False
+    #)
+    #bundles = models.OneToManyField(Product)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Product bundle'
+        verbose_name_plural = 'Product bundles'
+
+    def __str__(self):
+        return '{}'.format(self.name)
+
+reversion.register(ProductBundle)
 
 
 class PaymentState(TimeStampedModel):
@@ -221,6 +249,8 @@ class Payment(TimeStampedModel):
         return int(self.total * Decimal('100'))
 
 reversion.register(Payment)
+
+
 
 
 class StripeCustomer(TimeStampedModel):
