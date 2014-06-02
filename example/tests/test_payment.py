@@ -18,6 +18,8 @@ from pay.models import (
 from pay.tests.model_maker import (
     make_payment,
     make_product,
+    make_product_category,
+    make_product_type,
 )
 from pay.service import init_app_pay
 
@@ -29,7 +31,11 @@ class TestPayment(TestCase):
 
     def setUp(self):
         init_app_pay()
-        self.pencil = make_product('Pencil', 'pencil', Decimal('1.32'))
+        stock = make_product_type('Stock', 'stock')
+        stationery = make_product_category('Stationery', 'stationery', stock)
+        self.pencil = make_product(
+            'Pencil', 'pencil', Decimal('1.32'), stationery
+        )
 
     def _get_payment(self):
         return Payment.objects.get(email='test@pkimber.net')

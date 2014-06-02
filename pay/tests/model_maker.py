@@ -9,6 +9,8 @@ from pay.models import (
     Payment,
     PaymentState,
     Product,
+    ProductCategory,
+    ProductType,
 )
 
 
@@ -39,11 +41,31 @@ def make_payment_state(name, slug, **kwargs):
     return clean_and_save(PaymentState(**defaults))
 
 
-def make_product(title, slug, price, **kwargs):
+def make_product(name, slug, price, category, **kwargs):
     defaults = dict(
-        title=title,
+        name=name,
         slug=slugify(slug),
         price=price,
+        category=category,
     )
     defaults.update(kwargs)
     return clean_and_save(Product(**defaults))
+
+
+def make_product_category(name, slug, product_type, **kwargs):
+    defaults = dict(
+        name=name,
+        slug=slugify(slug),
+        product_type=product_type,
+    )
+    defaults.update(kwargs)
+    return clean_and_save(ProductCategory(**defaults))
+
+
+def make_product_type(name, slug, **kwargs):
+    defaults = dict(
+        name=name,
+        slug=slugify(slug),
+    )
+    defaults.update(kwargs)
+    return clean_and_save(ProductType(**defaults))

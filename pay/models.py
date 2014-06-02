@@ -27,6 +27,41 @@ class PayError(Exception):
         return repr('%s, %s' % (self.__class__.__name__, self.value))
 
 
+class ProductType(TimeStampedModel):
+    """Type of product e.g. course or membership."""
+
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Product type'
+        verbose_name_plural = 'Product types'
+
+    def __str__(self):
+        return '{}'.format(self.name)
+
+reversion.register(ProductType)
+
+
+class ProductCategory(TimeStampedModel):
+    """Category of product e.g. craft or gardening course."""
+
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    product_type = models.ForeignKey(ProductType)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Product category'
+        verbose_name_plural = 'Product categories'
+
+    def __str__(self):
+        return '{}'.format(self.name)
+
+reversion.register(ProductCategory)
+
+
 class Product(TimeStampedModel):
     """List of products and their price.
 
@@ -35,13 +70,16 @@ class Product(TimeStampedModel):
     separately.
     """
 
-    title = models.CharField(max_length=100)
+    name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
+    category = models.ForeignKey(ProductCategory)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     bundle = models.ManyToManyField(
         'self', blank=True, null=True, symmetrical=False
     )
+    # option to hide legacy products
+    legacy = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('slug',)
@@ -49,7 +87,7 @@ class Product(TimeStampedModel):
         verbose_name_plural = 'Product'
 
     def __str__(self):
-        return '{}'.format(self.title)
+        return '{}'.format(self.name)
 
     @property
     def is_bundle(self):

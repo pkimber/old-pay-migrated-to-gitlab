@@ -7,10 +7,14 @@ from mail.service import init_mail_template
 from pay.models import (
     PaymentState,
     Product,
+    ProductCategory,
+    ProductType,
 )
 from pay.tests.model_maker import (
     make_payment_state,
     make_product,
+    make_product_category,
+    make_product_type,
 )
 
 
@@ -58,7 +62,7 @@ def init_app_pay():
     )
 
 
-def init_product(title, slug, description, price):
+def init_product(title, slug, description, price, product_category, **kwargs):
     """Create a new product - if it doesn't exist."""
     slug = slugify(slug)
     try:
@@ -68,6 +72,24 @@ def init_product(title, slug, description, price):
     except Product.DoesNotExist:
         if not description:
             description = ''
-        result = make_product(title, slug, price, description=description)
-        #print('make_product("{}")'.format(title))
+        kwargs.update(dict(description=description))
+        result = make_product(title, slug, price, product_category, **kwargs)
+    return result
+
+
+def init_product_category(name, slug, product_type):
+    result = None
+    try:
+        result = ProductCategory.objects.get(slug=slug)
+    except ProductCategory.DoesNotExist:
+        result = make_product_category(name, slug, product_type)
+    return result
+
+
+def init_product_type(name, slug):
+    result = None
+    try:
+        result = ProductType.objects.get(slug=slug)
+    except ProductType.DoesNotExist:
+        result = make_product_type(name, slug)
     return result

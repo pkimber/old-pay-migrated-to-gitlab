@@ -6,25 +6,51 @@ from decimal import Decimal
 from django.db import IntegrityError
 from django.test import TestCase
 
-from pay.tests.model_maker import make_product
+from pay.tests.model_maker import (
+    make_product,
+    make_product_category,
+    make_product_type,
+)
 
 
 class TestProductBundle(TestCase):
 
     def setUp(self):
+        stock = make_product_type('Stock', 'stock')
+        stationery = make_product_category('Stationery', 'stationery', stock)
+        bundle = make_product_category('Bundle', 'bundle', stock)
         # two bundles
         self.promotion = make_product(
-            'Pens and Pencils', 'pen_promo', Decimal('2.50')
+            'Pens and Pencils',
+            'pen_promo',
+            Decimal('2.50'),
+            bundle,
         )
         self.special_offer = make_product(
-            'Pencils and more pencils', 'pencils_promo', Decimal('1.50')
+            'Pencils and more pencils',
+            'pencils_promo',
+            Decimal('1.50'),
+            bundle,
         )
         # products
         self.pack_pencils = make_product(
-            'Pack pencils', 'pack_pencil', Decimal('2.00')
+            'Pack pencils',
+            'pack_pencil',
+            Decimal('2.00'),
+            stationery,
         )
-        self.pen = make_product('Pen', 'pen', Decimal('2.00'))
-        self.pencil = make_product('Pencil', 'pencil', Decimal('1.32'))
+        self.pen = make_product(
+            'Pen',
+            'pen',
+            Decimal('2.00'),
+            stationery,
+        )
+        self.pencil = make_product(
+            'Pencil',
+            'pencil',
+            Decimal('1.32'),
+            stationery,
+        )
         # add products to the 'promotion' bundle
         self.promotion.bundle.add(self.pen)
         self.promotion.bundle.add(self.pencil)

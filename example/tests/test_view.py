@@ -13,7 +13,11 @@ from login.tests.scenario import (
 
 from pay.models import Payment
 from pay.service import init_app_pay
-from pay.tests.model_maker import make_product
+from pay.tests.model_maker import (
+    make_product,
+    make_product_category,
+    make_product_type,
+)
 from pay.views import PAYMENT_PK
 
 from example.tests.model_maker import make_sales_ledger
@@ -36,7 +40,9 @@ class TestView(TestCase):
             password=self.web.username
         )
         # create a payment
-        pencil = make_product('Pencil', 'pencil', Decimal('1.32'))
+        stock = make_product_type('Stock', 'stock')
+        stationery = make_product_category('Stationery', 'stationery', stock)
+        pencil = make_product('Pencil', 'pencil', Decimal('1.32'), stationery)
         sales_ledger = make_sales_ledger(
             'test@pkimber.net', 'Joan', pencil, 2
         )

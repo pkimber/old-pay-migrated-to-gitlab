@@ -40,7 +40,7 @@ class SalesLedger(models.Model):
             price=self.product.price,
             product=self.product,
             quantity=self.quantity,
-            title=self.product.title,
+            title=self.product.name,
         ))
 
     @property
