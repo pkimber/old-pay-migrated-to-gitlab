@@ -74,8 +74,23 @@ def init_product(name, slug, description, price, product_category, **kwargs):
     slug = slugify(slug)
     try:
         result = Product.objects.get(slug=slug)
-        # If the product exists - don't update it!!!
+        update = False
+        # If the product exists - don't update it unless it is empty...
         # The user might have set a new price or description!!
+        if not result.name:
+            result.name = name or ''
+            update = True
+        if not result.description:
+            result.description = description or ''
+            update = True
+        if not result.price:
+            result.price = price
+            update = True
+        if result.category.slug == 'demo':
+            result.category = product_category
+            update = True
+        if update:
+            result.save()
     except Product.DoesNotExist:
         if not description:
             description = ''
