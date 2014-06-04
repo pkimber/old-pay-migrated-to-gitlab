@@ -53,7 +53,7 @@ def init_app_pay():
             "{{ total }} total value of the transaction."
         ),
         False,
-        settings.MAIL_TYPE,
+        settings.MAIL_TEMPLATE_TYPE,
     )
     init_mail_template(
         PAYMENT_THANKYOU,
@@ -65,7 +65,7 @@ def init_app_pay():
             "{{ total }} total value of the transaction."
         ),
         False,
-        settings.MAIL_TYPE,
+        settings.MAIL_TEMPLATE_TYPE,
     )
 
 
