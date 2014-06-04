@@ -51,23 +51,24 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('pay', ['ProductCategory'])
 
-        # we need a product type before we can create a product
-        try:
-            product_type = orm['pay.ProductType'].objects.get(pk=1)
-        except ObjectDoesNotExist:
-            product_type = orm['pay.ProductType'].objects.create(
-                name='demo',
-                slug='demo',
-            )
-        # we need a product category before we can add a category to the product table.
-        try:
-            product_category = orm['pay.ProductCategory'].objects.get(pk=1)
-        except ObjectDoesNotExist:
-            product_category = orm['pay.ProductCategory'].objects.create(
-                name='demo',
-                slug='demo',
-                product_type=product_type,
-            )
+        if not db.dry_run:
+            # we need a product type before we can create a product
+            try:
+                product_type = orm['pay.ProductType'].objects.get(pk=1)
+            except ObjectDoesNotExist:
+                product_type = orm['pay.ProductType'].objects.create(
+                    name='demo',
+                    slug='demo',
+                )
+            # we need a product category before we can add a category to the product table.
+            try:
+                product_category = orm['pay.ProductCategory'].objects.get(pk=1)
+            except ObjectDoesNotExist:
+                product_category = orm['pay.ProductCategory'].objects.create(
+                    name='demo',
+                    slug='demo',
+                    product_type=product_type,
+                )
 
         # Deleting field 'Product.title'
         db.delete_column('pay_product', 'title')
