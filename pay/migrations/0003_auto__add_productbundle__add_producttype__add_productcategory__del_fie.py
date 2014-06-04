@@ -3,6 +3,7 @@ from south.utils import datetime_utils as datetime
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class Migration(SchemaMigration):
@@ -50,6 +51,24 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('pay', ['ProductCategory'])
 
+        # we need a product type before we can create a product
+        try:
+            product_type = orm['pay.ProductType'].objects.get(pk=1)
+        except ObjectDoesNotExist:
+            product_type = orm['pay.ProductType'].objects.create(
+                name='demo',
+                slug='demo',
+            )
+        # we need a product category before we can add a category to the product table.
+        try:
+            product_category = orm['pay.ProductCategory'].objects.get(pk=1)
+        except ObjectDoesNotExist:
+            product_category = orm['pay.ProductCategory'].objects.create(
+                name='demo',
+                slug='demo',
+                product_type=product_type,
+            )
+
         # Deleting field 'Product.title'
         db.delete_column('pay_product', 'title')
 
@@ -58,7 +77,7 @@ class Migration(SchemaMigration):
                       self.gf('django.db.models.fields.CharField')(default='', max_length=100),
                       keep_default=False)
 
-        # Adding field 'Product.category'
+        # Adding field 'Product.category'.  The category is created by default (see above).
         db.add_column('pay_product', 'category',
                       self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['pay.ProductCategory']),
                       keep_default=False)

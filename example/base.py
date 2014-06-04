@@ -14,7 +14,7 @@ def get_env_variable(key):
     Copied from Django two scoops book
     """
     try:
-        return os.environ.get(key)
+        return os.environ[key]
     except KeyError:
         error_msg = "Set the {} env variable".format(key)
         print('ImproperlyConfigured: {}'.format(error_msg))
@@ -195,6 +195,9 @@ FTP_STATIC_URL = None
 # URL where requests are redirected after login when the contrib.auth.login
 # view gets no next parameter.
 LOGIN_REDIRECT_URL = reverse_lazy('project.home.user')
+
+# Use an item from the list in 'mail.models'
+MAIL_TYPE = 'mandrill'
 
 # Put in the example app for testing purposes only
 MAILGUN_SERVER_NAME = get_env_variable("MAILGUN_SERVER_NAME")

@@ -6,6 +6,8 @@ Django application for an online payment.
 For notes:
 https://django-dev-and-deploy-using-salt.readthedocs.org/en/latest/app-pay.html
 and
+https://github.com/pkimber/docs/blob/master/source/app-pay.rst
+and
 https://github.com/pkimber/docs/blob/master/source/paypal.rst
 
 Install

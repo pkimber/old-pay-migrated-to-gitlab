@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.conf import settings
 from django.utils.text import slugify
 
 from mail.service import init_mail_template
@@ -50,7 +51,9 @@ def init_app_pay():
             "{{ name }} name of the customer.\n"
             "{{ description }} transaction detail.\n"
             "{{ total }} total value of the transaction."
-        )
+        ),
+        False,
+        settings.MAIL_TYPE,
     )
     init_mail_template(
         PAYMENT_THANKYOU,
@@ -60,11 +63,13 @@ def init_app_pay():
             "{{ name }} name of the customer.\n"
             "{{ description }} transaction detail.\n"
             "{{ total }} total value of the transaction."
-        )
+        ),
+        False,
+        settings.MAIL_TYPE,
     )
 
 
-def init_product(title, slug, description, price, product_category, **kwargs):
+def init_product(name, slug, description, price, product_category, **kwargs):
     """Create a new product - if it doesn't exist."""
     slug = slugify(slug)
     try:
@@ -75,7 +80,7 @@ def init_product(title, slug, description, price, product_category, **kwargs):
         if not description:
             description = ''
         kwargs.update(dict(description=description))
-        result = make_product(title, slug, price, product_category, **kwargs)
+        result = make_product(name, slug, price, product_category, **kwargs)
     return result
 
 
