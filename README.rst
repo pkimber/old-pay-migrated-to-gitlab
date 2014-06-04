@@ -36,14 +36,11 @@ Testing
 Usage
 =====
 
-.. note::
+.. note:: Replace ``your_stripe_publish_key`` and ``your_stripe_secret_key``
+          with the test versions of the *publishable* and *secret* key.
 
-  Replace ``your_stripe_publish_key`` and ``your_stripe_secret_key`` with the
-  test versions of the *publishable* and *secret* key.
-
-.. note::
-  The ``MAIL_TEMPLATE_TYPE`` should be selected from the list of constants at
-  the top of the ``mail.models`` module.
+.. note:: The ``MAIL_TEMPLATE_TYPE`` should be selected from the list of
+          constants at the top of the ``mail.models`` module.
 
 ::
 
