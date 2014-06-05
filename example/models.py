@@ -34,11 +34,10 @@ class SalesLedger(models.Model):
 
     def create_payment(self):
         return Payment(**dict(
-            content_object = self,
+            content_object=self,
             email=self.email,
             name=self.title,
             price=self.product.price,
-            product=self.product,
             quantity=self.quantity,
             title=self.product.name,
         ))

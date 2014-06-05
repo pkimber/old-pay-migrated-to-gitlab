@@ -44,7 +44,6 @@ class TestPayment(TestCase):
         return make_payment(
             'Mr Patrick Kimber',
             'test@pkimber.net',
-            self.pencil,
             'Colour pencils',
             1,
             Decimal('10.00'),
@@ -96,11 +95,13 @@ class TestPayment(TestCase):
         line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = self._make_payment(line)
         self.assertEqual(
-            dict(
-                description='Colour pencils (1 x £10.00)',
-                name='Mr Patrick Kimber',
-                total='£10.00',
-            ),
+            {
+                'test@pkimber.net': dict(
+                    description='Colour pencils (1 x £10.00)',
+                    name='Mr Patrick Kimber',
+                    total='£10.00',
+                ),
+            },
             payment.mail_template_context(),
         )
 
@@ -110,9 +111,7 @@ class TestPayment(TestCase):
 
     def test_no_content_object(self):
         """Payments must be linked to a content object."""
-        payment = Payment(**dict(
-            product=self.pencil, quantity=Decimal(2), url='/after/')
-        )
+        payment = Payment(**dict(quantity=Decimal(2), url='/after/'))
         self.assertRaises(
             IntegrityError,
             clean_and_save,
@@ -147,7 +146,6 @@ class TestPayment(TestCase):
         payment = make_payment(
             'Carol C',
             'test@pkimber.net',
-            self.pencil,
             'Colour pencils',
             2,
             Decimal('1.32'),

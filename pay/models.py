@@ -146,11 +146,18 @@ reversion.register(PaymentState)
 
 
 class Payment(TimeStampedModel):
-    """List of payments."""
+    """List of payments.
+
+    Adding bundles because they are being paid for... but I am not sure if I
+    am duplicating data.  It is becoming too complicated I think.  We have the
+    content object, so why not just remove the product and the bundle?
+    """
 
     name = models.TextField()
     email = models.EmailField()
-    product = models.ForeignKey(Product)
+    #product = models.ForeignKey(Product)
+    #bundles of products for special offers/promotions.
+    #bundle = models.ForeignKey(ProductBundle, blank=True, null=True)
     title = models.CharField(max_length=100)
     quantity = models.IntegerField()
     # we store the price in case the product is edited!
@@ -222,11 +229,13 @@ class Payment(TimeStampedModel):
         return self.state.slug == PaymentState.PAID
 
     def mail_template_context(self):
-        return dict(
-            description=self.description,
-            name=self.name,
-            total='£{:.2f}'.format(self.total),
-        )
+        return {
+            self.email: dict(
+                description=self.description,
+                name=self.name,
+                total='£{:.2f}'.format(self.total),
+            ),
+        }
 
     def save_token(self, token):
         self.check_can_pay()
@@ -249,8 +258,6 @@ class Payment(TimeStampedModel):
         return int(self.total * Decimal('100'))
 
 reversion.register(Payment)
-
-
 
 
 class StripeCustomer(TimeStampedModel):

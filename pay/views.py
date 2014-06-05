@@ -10,11 +10,7 @@ from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
 from django.views.generic import UpdateView
 
-from mail.service import (
-    mail_template_render,
-    queue_mail,
-)
-#from paypal.standard.forms import PayPalPaymentsForm
+from mail.service import queue_mail_template
 
 from .forms import StripeForm
 from .models import (
@@ -71,10 +67,11 @@ def pay_later_view(request, pk):
     _check_perm(request, payment)
     payment.check_can_pay()
     payment.set_pay_later()
-    subject, description = mail_template_render(
-        PAYMENT_LATER, payment.mail_template_context()
+    queue_mail_template(
+        payment,
+        PAYMENT_LATER,
+        payment.mail_template_context(),
     )
-    queue_mail(payment, [payment.email,], subject, description)
     return HttpResponseRedirect(payment.url)
 
 
