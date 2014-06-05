@@ -179,10 +179,11 @@ class StripeFormViewMixin(object):
                 description=self.object.description,
             )
             self.object.set_paid()
-            subject, description = mail_template_render(
-                PAYMENT_THANKYOU, self.object.mail_template_context()
+            queue_mail_template(
+                self.object,
+                PAYMENT_THANKYOU,
+                self.object.mail_template_context()
             )
-            queue_mail(self.object, [self.object.email,], subject, description)
             result = super(StripeFormViewMixin, self).form_valid(form)
         except stripe.CardError as e:
             self.object.set_payment_failed()
