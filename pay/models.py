@@ -27,103 +27,6 @@ class PayError(Exception):
         return repr('%s, %s' % (self.__class__.__name__, self.value))
 
 
-class ProductType(TimeStampedModel):
-    """Type of product e.g. course or membership."""
-
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
-
-    class Meta:
-        ordering = ('name',)
-        verbose_name = 'Product type'
-        verbose_name_plural = 'Product types'
-
-    def __str__(self):
-        return '{}'.format(self.name)
-
-reversion.register(ProductType)
-
-
-class ProductCategory(TimeStampedModel):
-    """Category of product e.g. craft or gardening course."""
-
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
-    product_type = models.ForeignKey(ProductType)
-
-    class Meta:
-        ordering = ('name',)
-        verbose_name = 'Product category'
-        verbose_name_plural = 'Product categories'
-
-    def __str__(self):
-        return '{}'.format(self.name)
-
-reversion.register(ProductCategory)
-
-
-class Product(TimeStampedModel):
-    """List of products and their price.
-
-    The 'bundle' field allows us to build a bundle of products
-    e.g. a pack of pencils + pens for a cheaper price than buying them
-    separately.
-    """
-
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
-    category = models.ForeignKey(ProductCategory)
-    description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    #bundle = models.ManyToManyField(
-    #    'self', blank=True, null=True, symmetrical=False
-    #)
-    # option to hide legacy products
-    legacy = models.BooleanField(default=False)
-
-    class Meta:
-        ordering = ('slug',)
-        verbose_name = 'Product'
-        verbose_name_plural = 'Product'
-
-    def __str__(self):
-        return '{}'.format(self.name)
-
-    #@property
-    #def is_bundle(self):
-    #    return bool(self.bundle.count())
-
-reversion.register(Product)
-
-
-class ProductBundle(TimeStampedModel):
-    """If a product is selected... then display the 'bundle' of products.
-
-    If a product is selected, then these are the bundles to display.
-    """
-
-    name = models.CharField(max_length=100)
-    slug = models.SlugField(unique=True)
-    product = models.ForeignKey(Product, related_name='+')
-    price = models.DecimalField(max_digits=8, decimal_places=2)
-    bundle = models.ManyToManyField(Product, related_name='bundles')
-
-    #product = models.ForeignKey(Product)
-    #    'self', blank=True, null=True, symmetrical=False
-    #)
-    #bundles = models.OneToManyField(Product)
-
-    class Meta:
-        ordering = ('name',)
-        verbose_name = 'Product bundle'
-        verbose_name_plural = 'Product bundles'
-
-    def __str__(self):
-        return '{}'.format(self.name)
-
-reversion.register(ProductBundle)
-
-
 class PaymentState(TimeStampedModel):
 
     DUE = 'due'
@@ -146,21 +49,12 @@ reversion.register(PaymentState)
 
 
 class Payment(TimeStampedModel):
-    """List of payments.
-
-    Adding bundles because they are being paid for... but I am not sure if I
-    am duplicating data.  It is becoming too complicated I think.  We have the
-    content object, so why not just remove the product and the bundle?
-    """
+    """List of payments."""
 
     name = models.TextField()
     email = models.EmailField()
-    #product = models.ForeignKey(Product)
-    #bundles of products for special offers/promotions.
-    #bundle = models.ForeignKey(ProductBundle, blank=True, null=True)
     title = models.CharField(max_length=100)
     quantity = models.IntegerField()
-    # we store the price in case the product is edited!
     price = models.DecimalField(max_digits=8, decimal_places=2)
     state = models.ForeignKey(
         PaymentState,

@@ -10,17 +10,18 @@ from django.utils import timezone
 
 from base.tests.model_maker import clean_and_save
 
+from stock.tests.model_maker import (
+    make_product,
+    make_product_category,
+    make_product_type,
+)
+
 from pay.models import (
     PayError,
     Payment,
     PaymentState,
 )
-from pay.tests.model_maker import (
-    make_payment,
-    make_product,
-    make_product_category,
-    make_product_type,
-)
+from pay.tests.model_maker import make_payment
 from pay.service import init_app_pay
 
 from example.models import SalesLedger

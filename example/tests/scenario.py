@@ -3,8 +3,7 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 
-from pay.tests.model_maker import (
-    make_payment,
+from stock.tests.model_maker import (
     make_product,
     make_product_category,
     make_product_type,

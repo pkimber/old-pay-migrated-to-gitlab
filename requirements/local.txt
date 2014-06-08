@@ -3,6 +3,7 @@
 -e ../base
 -e ../login
 -e ../mail
+-e ../stock
 beautifulsoup4
 gitpython
 hgapi

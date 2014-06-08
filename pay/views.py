@@ -8,7 +8,6 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
-from django.views.generic import UpdateView
 
 from mail.service import queue_mail_template
 

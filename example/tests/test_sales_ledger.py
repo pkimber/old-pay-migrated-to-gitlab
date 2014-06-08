@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from pay.models import Payment
 from pay.service import init_app_pay
 from pay.tests.helper import check_payment
 
@@ -19,5 +18,5 @@ class TestSalesLedger(TestCase):
 
     def test_link_to_payment(self):
         sales_ledger = SalesLedger.objects.get(title='Andi')
-        payment = sales_ledger.create_payment()
+        sales_ledger.create_payment()
         check_payment(sales_ledger)

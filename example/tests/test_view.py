@@ -10,18 +10,16 @@ from login.tests.scenario import (
     default_scenario_login,
     get_user_web,
 )
-
-from pay.models import Payment
-from pay.service import init_app_pay
-from pay.tests.model_maker import (
+from stock.tests.model_maker import (
     make_product,
     make_product_category,
     make_product_type,
 )
+
+from pay.service import init_app_pay
 from pay.views import PAYMENT_PK
 
 from example.tests.model_maker import make_sales_ledger
-from example.tests.scenario import default_scenario_pay
 
 
 class TestView(TestCase):
