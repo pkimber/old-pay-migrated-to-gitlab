@@ -10,7 +10,7 @@
 {% endblock sub_heading %}
 
 {% block content %}
-  <div class="pure-g-r">
+  <div class="pure-g">
     <div class="pure-u-1">
       <div class="l-box">
         <table class="pure-table pure-table-bordered">
@@ -28,7 +28,7 @@
             {% for p in object_list %}
               <tr valign="top">
                 <td>{{ p.title }}</td>
-                <td>{{ p.product.title }}</td>
+                <td>{{ p.product.name }}</td>
                 <td>{{ p.product.price }}</td>
                 <td>{{ p.quantity }}</td>
                 <td><strong>{{ p.payment_state.name }}</strong></td>
