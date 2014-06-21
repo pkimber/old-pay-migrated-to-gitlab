@@ -113,10 +113,10 @@ class Payment(TimeStampedModel):
             )
 
     def check_can_pay_later(self):
-        if not self.state.slug == PaymentState.LATER:
+        if not self.state.slug in (PaymentState.FAIL, PaymentState.LATER):
             raise PayError(
                 'Cannot pay this transaction (it is not due to '
-                'be paid later) [{}]'.format(self.pk)
+                'be paid later or failed) [{}]'.format(self.pk)
             )
 
     def is_paid(self):
