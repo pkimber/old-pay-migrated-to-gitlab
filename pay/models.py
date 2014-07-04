@@ -53,7 +53,7 @@ class Payment(TimeStampedModel):
 
     name = models.TextField()
     email = models.EmailField()
-    title = models.CharField(max_length=100)
+    title = models.TextField()
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
     state = models.ForeignKey(
