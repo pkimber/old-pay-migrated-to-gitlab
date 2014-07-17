@@ -6,6 +6,7 @@ from decimal import Decimal
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from login.tests.factories import TEST_PASSWORD
 from login.tests.scenario import (
     default_scenario_login,
     get_user_web,
@@ -33,10 +34,10 @@ class TestView(TestCase):
         default_scenario_login()
         #default_scenario_pay()
         self.web = get_user_web()
-        self.client.login(
+        self.assertTrue(self.client.login(
             username=self.web.username,
-            password=self.web.username
-        )
+            password=TEST_PASSWORD,
+        ))
         # create a payment
         stock = make_product_type('Stock', 'stock')
         stationery = make_product_category('Stationery', 'stationery', stock)

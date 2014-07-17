@@ -5,6 +5,7 @@
 -e ../mail
 -e ../stock
 beautifulsoup4
+factory-boy
 gitpython
 hgapi
 ipdb
