@@ -83,9 +83,9 @@ class Payment(TimeStampedModel):
     def __str__(self):
         return '{} = {}'.format(self.description, self.total)
 
-    def _description(self):
+    @property
+    def description(self):
         return '{} ({} x £{:.2f})'.format(self.title, self.quantity, self.price)
-    description = property(_description)
 
     def _set_payment_state(self, payment_state):
         """Mirror payment state to content object (to make queries easy)."""
@@ -121,6 +121,18 @@ class Payment(TimeStampedModel):
 
     def is_paid(self):
         return self.state.slug == PaymentState.PAID
+
+    def mail_notification_message(self, request):
+        result = '{} - payment received from {}, {}:'.format(
+            self.created.strftime('%d/%m/%Y %H:%M'),
+            self.name,
+            self.email,
+        )
+        result = result + '\n\n{}\n\n{}'.format(
+            self.description,
+            request.build_absolute_uri(self.content_object.get_absolute_url()),
+        )
+        return result
 
     def mail_template_context(self):
         return {

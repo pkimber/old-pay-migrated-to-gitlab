@@ -124,6 +124,22 @@ class StripeFormViewMixin(object):
             )
         )
 
+    def _send_notification_email(self):
+        email_addresses = [n.email for n in Notify.objects.all()]
+        if email_addresses:
+            queue_mail_message(
+                self.object,
+                email_addresses,
+                'Payment from {}'.format(instance.name),
+                self._notification_message(instance),
+            )
+        else:
+            logging.error(
+                "Enquiry app cannot send email notifications.  "
+                "No email addresses set-up in 'enquiry.models.Notify'"
+            )
+
+
     def _stripe_customer_create(self, name, email, token):
         """Use the Stripe API to create/update a customer."""
         try:
@@ -183,6 +199,7 @@ class StripeFormViewMixin(object):
                 PAYMENT_THANKYOU,
                 self.object.mail_template_context()
             )
+            self._send_notification_email()
             result = super(StripeFormViewMixin, self).form_valid(form)
         except stripe.CardError as e:
             self.object.set_payment_failed()

@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 
+from django.core.urlresolvers import reverse
 from django.db import models
 
 from stock.models import Product
@@ -31,6 +32,10 @@ class SalesLedger(models.Model):
 
     def __str__(self):
         return '{}'.format(self.title)
+
+    def get_absolute_url(self):
+        """just for testing."""
+        return reverse('project.home')
 
     def create_payment(self):
         return Payment(**dict(

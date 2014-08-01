@@ -4,8 +4,10 @@ from __future__ import unicode_literals
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
+from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.test import TestCase
+from django.test.client import RequestFactory
 from django.utils import timezone
 
 from base.tests.model_maker import clean_and_save
@@ -21,10 +23,12 @@ from pay.models import (
     Payment,
     PaymentState,
 )
+from pay.tests.factories import PaymentFactory
 from pay.tests.model_maker import make_payment
 from pay.service import init_app_pay
 
 from example.models import SalesLedger
+from example.tests.factories import SalesLedgerFactory
 from example.tests.model_maker import make_sales_ledger
 
 
@@ -118,6 +122,15 @@ class TestPayment(TestCase):
             clean_and_save,
             payment,
         )
+
+    def test_notification_message(self):
+        payment = PaymentFactory(content_object=SalesLedgerFactory())
+        factory = RequestFactory()
+        request = factory.get(reverse('project.home'))
+        message = payment.mail_notification_message(request)
+        self.assertIn('payment received from Mr', message)
+        self.assertIn('Purchase ref', message)
+        self.assertIn('http://testserver/', message)
 
     def test_set_paid(self):
         line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
