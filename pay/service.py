@@ -34,7 +34,6 @@ def init_app_pay():
         PAYMENT_LATER,
         'Thank you for your application',
         (
-            "We will contact you to arrange payment.\n\n"
             "You can add the following variables to the template:\n"
             "{{ name }} name of the customer.\n"
             "{{ description }} transaction detail.\n"
@@ -42,6 +41,8 @@ def init_app_pay():
         ),
         False,
         settings.MAIL_TEMPLATE_TYPE,
+        subject='Thank you for your application',
+        description="We will contact you to arrange payment.",
     )
     init_mail_template(
         PAYMENT_THANKYOU,
@@ -54,4 +55,6 @@ def init_app_pay():
         ),
         False,
         settings.MAIL_TEMPLATE_TYPE,
+        subject='Thank you for your payment',
+        description="We will send you the course materials.",
     )

@@ -9,7 +9,11 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
 
-from mail.service import queue_mail_template
+from mail.models import Notify
+from mail.service import (
+    queue_mail_message,
+    queue_mail_template,
+)
 
 from .forms import StripeForm
 from .models import (
@@ -60,6 +64,23 @@ def _check_perm(request, payment):
         raise PermissionDenied('Valid payment check failed.')
 
 
+def _send_notification_email(payment, request):
+    email_addresses = [n.email for n in Notify.objects.all()]
+    if email_addresses:
+        subject, message = payment.mail_subject_and_message(request)
+        queue_mail_message(
+            payment,
+            email_addresses,
+            subject,
+            message,
+        )
+    else:
+        logging.error(
+            "Cannot send email notification of payment.  "
+            "No email addresses set-up in 'enquiry.models.Notify'"
+        )
+
+
 @require_POST
 def pay_later_view(request, pk):
     payment = Payment.objects.get(pk=pk)
@@ -71,6 +92,7 @@ def pay_later_view(request, pk):
         PAYMENT_LATER,
         payment.mail_template_context(),
     )
+    _send_notification_email(payment, request)
     return HttpResponseRedirect(payment.url)
 
 
@@ -123,22 +145,6 @@ class StripeFormViewMixin(object):
                 e.http_status,
             )
         )
-
-    def _send_notification_email(self):
-        email_addresses = [n.email for n in Notify.objects.all()]
-        if email_addresses:
-            queue_mail_message(
-                self.object,
-                email_addresses,
-                'Payment from {}'.format(instance.name),
-                self._notification_message(instance),
-            )
-        else:
-            logging.error(
-                "Enquiry app cannot send email notifications.  "
-                "No email addresses set-up in 'enquiry.models.Notify'"
-            )
-
 
     def _stripe_customer_create(self, name, email, token):
         """Use the Stripe API to create/update a customer."""
@@ -199,7 +205,7 @@ class StripeFormViewMixin(object):
                 PAYMENT_THANKYOU,
                 self.object.mail_template_context()
             )
-            self._send_notification_email()
+            _send_notification_email(self.object, self.request)
             result = super(StripeFormViewMixin, self).form_valid(form)
         except stripe.CardError as e:
             self.object.set_payment_failed()

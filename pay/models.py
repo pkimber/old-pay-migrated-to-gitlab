@@ -119,20 +119,33 @@ class Payment(TimeStampedModel):
                 'be paid later or failed) [{}]'.format(self.pk)
             )
 
+    @property
     def is_paid(self):
         return self.state.slug == PaymentState.PAID
 
-    def mail_notification_message(self, request):
-        result = '{} - payment received from {}, {}:'.format(
+    @property
+    def is_pay_later(self):
+        return self.state.slug == PaymentState.LATER
+
+    def mail_subject_and_message(self, request):
+        if self.is_paid:
+            caption = 'payment received'
+        elif self.is_pay_later:
+            caption = 'request to pay by payment plan (or cheque)'
+        else:
+            caption = 'unknown request'
+        subject = '{} from {}'.format(caption.capitalize(), self.name)
+        message = '{} - {} from {}, {}:'.format(
             self.created.strftime('%d/%m/%Y %H:%M'),
+            caption,
             self.name,
             self.email,
         )
-        result = result + '\n\n{}\n\n{}'.format(
+        message = message + '\n\n{}\n\n{}'.format(
             self.description,
             request.build_absolute_uri(self.content_object.get_absolute_url()),
         )
-        return result
+        return subject, message
 
     def mail_template_context(self):
         return {

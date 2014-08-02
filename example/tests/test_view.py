@@ -11,6 +11,7 @@ from login.tests.scenario import (
     default_scenario_login,
     get_user_web,
 )
+from mail.tests.model_maker import make_notify
 from stock.tests.model_maker import (
     make_product,
     make_product_category,
@@ -31,6 +32,7 @@ class TestView(TestCase):
 
     def setUp(self):
         init_app_pay()
+        make_notify('test@pkimber.net')
         default_scenario_login()
         #default_scenario_pay()
         self.web = get_user_web()

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from decimal import Decimal
 
+from mail.tests.model_maker import make_notify
 from stock.tests.model_maker import (
     make_product,
     make_product_category,
@@ -13,6 +14,7 @@ from example.tests.model_maker import make_sales_ledger
 
 
 def default_scenario_pay():
+    make_notify('test@pkimber.net')
     stock = make_product_type('Stock', 'stock')
     stationery = make_product_category('Stationery', 'stationery', stock)
     pencil = make_product('Pencil', 'pencil', Decimal('1.32'), stationery)
