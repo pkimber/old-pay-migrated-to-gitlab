@@ -5,6 +5,7 @@
 -e ../mail
 -e ../stock
 beautifulsoup4
+devpi-client
 factory-boy
 gitpython
 hgapi
