@@ -79,7 +79,7 @@ class TestPayment(TestCase):
         """This should never happen... but test anyway."""
         line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = self._make_payment(line)
-        payment.created = timezone.now() + relativedelta(hours=+1)
+        payment.created = timezone.now() + relativedelta(hours=+1, minutes=+2)
         payment.save()
         self.assertRaises(
             PayError,
@@ -89,7 +89,7 @@ class TestPayment(TestCase):
     def test_check_can_pay_too_late(self):
         line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
         payment = self._make_payment(line)
-        payment.created = timezone.now() + relativedelta(hours=-1)
+        payment.created = timezone.now() + relativedelta(hours=-1, minutes=-3)
         payment.save()
         self.assertRaises(
             PayError,

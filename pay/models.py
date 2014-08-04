@@ -106,7 +106,7 @@ class Payment(TimeStampedModel):
             )
         td = timezone.now() - self.created
         diff = td.days * 1440 + td.seconds / 60
-        if abs(diff) > 15:
+        if abs(diff) > 60:
             raise PayError(
                 "Cannot pay this transaction.  It is too old "
                 "(or has travelled in time, {} {} {}).".format(
