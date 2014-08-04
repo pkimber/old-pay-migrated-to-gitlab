@@ -106,10 +106,14 @@ class Payment(TimeStampedModel):
             )
         td = timezone.now() - self.created
         diff = td.days * 1440 + td.seconds / 60
-        if abs(diff) > 5:
+        if abs(diff) > 15:
             raise PayError(
-                'Cannot pay this transaction. '
-                'It is too old (or has travelled in time).'
+                "Cannot pay this transaction.  It is too old "
+                "(or has travelled in time, {} {} {}).".format(
+                    self.created.strftime('%d/%m/%Y %H:%M'),
+                    timezone.now().strftime('%d/%m/%Y %H:%M'),
+                    abs(diff),
+                )
             )
 
     def check_can_pay_later(self):
