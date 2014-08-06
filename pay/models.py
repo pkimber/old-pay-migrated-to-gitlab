@@ -99,10 +99,11 @@ class Payment(TimeStampedModel):
     total = property(_total)
 
     def check_can_pay(self):
-        if not self.state.slug in (PaymentState.DUE, PaymentState.FAIL):
+        allowed = (PaymentState.DUE, PaymentState.FAIL, PaymentState.LATER)
+        if not self.state.slug in allowed:
             raise PayError(
-                "Cannot pay this transaction (it is not due or "
-                "failed earlier) [{}, '{}']".format(self.pk, self.state.slug)
+                "Cannot pay this transaction (it did not fail and is not due "
+                "now or later) [{}, '{}']".format(self.pk, self.state.slug)
             )
         td = timezone.now() - self.created
         diff = td.days * 1440 + td.seconds / 60
