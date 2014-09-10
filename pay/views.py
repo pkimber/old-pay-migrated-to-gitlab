@@ -14,6 +14,7 @@ from mail.service import (
     queue_mail_message,
     queue_mail_template,
 )
+from mail.tasks import process_mail
 
 from .forms import StripeForm
 from .models import (
@@ -93,6 +94,7 @@ def pay_later_view(request, pk):
         payment.mail_template_context(),
     )
     _send_notification_email(payment, request)
+    process_mail.delay()
     return HttpResponseRedirect(payment.url)
 
 
@@ -206,6 +208,7 @@ class StripeFormViewMixin(object):
                 self.object.mail_template_context()
             )
             _send_notification_email(self.object, self.request)
+            process_mail.delay()
             result = super(StripeFormViewMixin, self).form_valid(form)
         except stripe.CardError as e:
             self.object.set_payment_failed()
