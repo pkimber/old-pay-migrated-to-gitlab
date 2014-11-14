@@ -14,7 +14,12 @@ from base.model_utils import TimeStampedModel
 
 
 def default_payment_state():
-    return PaymentState.objects.get(slug=PaymentState.DUE)
+    return PaymentState.objects._due()
+
+
+def _default_payment_state_pk():
+    """For 'migrations' in other apps."""
+    return default_payment_state().pk
 
 
 class PayError(Exception):
@@ -27,6 +32,13 @@ class PayError(Exception):
         return repr('%s, %s' % (self.__class__.__name__, self.value))
 
 
+class PaymentStateManager(models.Manager):
+
+    def _due(self):
+        """Internal use only."""
+        return self.model.objects.get(slug=PaymentState.DUE)
+
+
 class PaymentState(TimeStampedModel):
 
     DUE = 'due'
@@ -36,6 +48,7 @@ class PaymentState(TimeStampedModel):
 
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
+    objects = PaymentStateManager()
 
     class Meta:
         ordering = ('name',)
@@ -56,10 +69,7 @@ class Payment(TimeStampedModel):
     title = models.TextField()
     quantity = models.IntegerField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    state = models.ForeignKey(
-        PaymentState,
-        default=default_payment_state,
-    )
+    state = models.ForeignKey(PaymentState, default=default_payment_state)
     url = models.CharField(
         max_length=100,
         help_text='redirect to this location after payment.'
