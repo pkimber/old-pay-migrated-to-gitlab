@@ -14,7 +14,7 @@ from base.model_utils import TimeStampedModel
 
 
 def default_payment_state():
-    return PaymentState.objects._due()
+    return PaymentState.objects.get(slug=PaymentState.DUE)
 
 
 def _default_payment_state_pk():
@@ -32,13 +32,6 @@ class PayError(Exception):
         return repr('%s, %s' % (self.__class__.__name__, self.value))
 
 
-class PaymentStateManager(models.Manager):
-
-    def _due(self):
-        """Internal use only."""
-        return self.model.objects.get(slug=PaymentState.DUE)
-
-
 class PaymentState(TimeStampedModel):
 
     DUE = 'due'
@@ -48,7 +41,6 @@ class PaymentState(TimeStampedModel):
 
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
-    objects = PaymentStateManager()
 
     class Meta:
         ordering = ('name',)
