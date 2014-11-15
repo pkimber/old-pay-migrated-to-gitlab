@@ -14,12 +14,7 @@ from base.model_utils import TimeStampedModel
 
 
 def default_payment_state():
-    return PaymentState.objects.get(slug=PaymentState.DUE)
-
-
-def _default_payment_state_pk():
-    """For 'migrations' in other apps."""
-    return default_payment_state().pk
+    return PaymentState.objects.get(slug=PaymentState.DUE).pk
 
 
 class PayError(Exception):
