@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from django.db import models, migrations
 
 
-def _create_state(model, name, slug):
+def _init_state(model, name, slug):
     try:
         model.objects.get(slug=slug)
     except model.DoesNotExist:
@@ -14,7 +14,9 @@ def _create_state(model, name, slug):
 
 
 def default_state(apps, schema_editor):
-    """Create default edit and moderation states.
+    """
+
+    Create default states.
 
     We can't import a model directly as it may be a newer version than this
     migration expects.  We use the historical version.
@@ -22,10 +24,10 @@ def default_state(apps, schema_editor):
     """
 
     PaymentState = apps.get_model('pay', 'PaymentState')
-    _create_state(PaymentState, 'Due', 'due')
-    _create_state(PaymentState, 'Fail', 'fail')
-    _create_state(PaymentState, 'Later', 'later')
-    _create_state(PaymentState, 'Paid', 'paid')
+    _init_state(PaymentState, 'Due', 'due')
+    _init_state(PaymentState, 'Fail', 'fail')
+    _init_state(PaymentState, 'Later', 'later')
+    _init_state(PaymentState, 'Paid', 'paid')
 
 
 class Migration(migrations.Migration):
