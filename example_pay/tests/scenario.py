@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from decimal import Decimal
 
 from mail.tests.model_maker import make_notify
@@ -10,7 +8,7 @@ from stock.tests.model_maker import (
     make_product_type,
 )
 
-from example.tests.model_maker import make_sales_ledger
+from example_pay.tests.model_maker import make_sales_ledger
 
 
 def default_scenario_pay():

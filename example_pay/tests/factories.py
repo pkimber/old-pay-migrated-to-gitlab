@@ -1,9 +1,7 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 import factory
 
-from example.models import SalesLedger
+from example_pay.models import SalesLedger
 from stock.tests.factories import ProductFactory
 
 

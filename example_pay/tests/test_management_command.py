@@ -1,9 +1,7 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
-from example.management.commands import demo_data_pay
+from example_pay.management.commands import demo_data_pay
 
 from pay.management.commands import init_app_pay
 

@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from decimal import Decimal
 
 from django.core.urlresolvers import reverse
@@ -21,7 +19,7 @@ from stock.tests.model_maker import (
 from pay.service import init_app_pay
 from pay.views import PAYMENT_PK
 
-from example.tests.model_maker import make_sales_ledger
+from example_pay.tests.model_maker import make_sales_ledger
 
 
 class TestView(TestCase):

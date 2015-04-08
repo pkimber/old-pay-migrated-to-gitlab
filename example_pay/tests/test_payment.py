@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
@@ -27,9 +25,9 @@ from pay.tests.factories import PaymentFactory
 from pay.tests.model_maker import make_payment
 from pay.service import init_app_pay
 
-from example.models import SalesLedger
-from example.tests.factories import SalesLedgerFactory
-from example.tests.model_maker import make_sales_ledger
+from example_pay.models import SalesLedger
+from example_pay.tests.factories import SalesLedgerFactory
+from example_pay.tests.model_maker import make_sales_ledger
 
 
 class TestPayment(TestCase):

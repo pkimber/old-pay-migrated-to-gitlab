@@ -1,13 +1,11 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
 from pay.service import init_app_pay
 from pay.tests.helper import check_payment
 
-from example.models import SalesLedger
-from example.tests.scenario import default_scenario_pay
+from example_pay.models import SalesLedger
+from example_pay.tests.scenario import default_scenario_pay
 
 
 class TestSalesLedger(TestCase):
