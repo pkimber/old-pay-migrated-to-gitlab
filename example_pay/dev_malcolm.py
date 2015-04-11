@@ -13,3 +13,10 @@ DATABASES = {
         'PORT': '',                                          # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+INSTALLED_APPS += (
+    #'django.contrib.formtools',
+    'django_extensions',
+    'debug_toolbar',
+)
+
