@@ -4,6 +4,7 @@ import stripe
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
 
@@ -199,7 +200,8 @@ class StripeFormViewMixin(object):
                 customer=customer_id,
                 description=self.object.description,
             )
-            self.object.set_paid()
+            with transaction.atomic():
+                self.object.set_paid()
             queue_mail_template(
                 self.object,
                 PAYMENT_THANKYOU,

@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from decimal import Decimal
 
 from django.contrib.contenttypes import generic
@@ -88,8 +86,8 @@ class Payment(TimeStampedModel):
         """Mirror payment state to content object (to make queries easy)."""
         self.state = payment_state
         self.save()
-        self.content_object.payment_state = payment_state
-        self.content_object.save()
+        # this method should set the state and save the data
+        self.content_object.set_payment_state(payment_state)
 
     def _total(self):
         return self.price * self.quantity

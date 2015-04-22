@@ -10,12 +10,11 @@ from login.tests.scenario import (
     get_user_web,
 )
 from mail.tests.model_maker import make_notify
-from stock.tests.model_maker import (
-    make_product,
-    make_product_category,
-    make_product_type,
+from stock.models import (
+    Product,
+    ProductCategory,
+    ProductType,
 )
-
 from pay.service import init_app_pay
 from pay.views import PAYMENT_PK
 
@@ -39,9 +38,13 @@ class TestView(TestCase):
             password=TEST_PASSWORD,
         ))
         # create a payment
-        stock = make_product_type('Stock', 'stock')
-        stationery = make_product_category('Stationery', 'stationery', stock)
-        pencil = make_product('Pencil', 'pencil', Decimal('1.32'), stationery)
+        stock = ProductType.objects.create_product_type('stock', 'Stock')
+        stationery = ProductCategory.objects.create_product_category(
+            'stationery', 'Stationery', stock
+        )
+        pencil = Product.objects.create_product(
+            'pencil', 'Pencil', '', Decimal('1.32'), stationery
+        )
         sales_ledger = make_sales_ledger(
             'test@pkimber.net', 'Joan', pencil, 2
         )

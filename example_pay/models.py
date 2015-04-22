@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core.urlresolvers import reverse
 from django.db import models
 
@@ -37,6 +35,9 @@ class SalesLedger(models.Model):
         """just for testing."""
         return reverse('project.home')
 
+    def allow_pay_later(self):
+        return False
+
     def create_payment(self):
         return Payment(**dict(
             content_object=self,
@@ -56,3 +57,7 @@ class SalesLedger(models.Model):
     def can_pay(self):
         due = PaymentState.objects.get(slug=PaymentState.DUE)
         return self.payment_state == due
+
+    def set_payment_state(self, payment_state):
+        self.payment_state = payment_state
+        self.save()

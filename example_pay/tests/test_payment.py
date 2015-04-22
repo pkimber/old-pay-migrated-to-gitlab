@@ -10,12 +10,6 @@ from django.utils import timezone
 
 from base.tests.model_maker import clean_and_save
 
-from stock.tests.model_maker import (
-    make_product,
-    make_product_category,
-    make_product_type,
-)
-
 from pay.models import (
     PayError,
     Payment,
@@ -24,6 +18,11 @@ from pay.models import (
 from pay.tests.factories import PaymentFactory
 from pay.tests.model_maker import make_payment
 from pay.service import init_app_pay
+from stock.models import (
+    Product,
+    ProductCategory,
+    ProductType,
+)
 
 from example_pay.models import SalesLedger
 from example_pay.tests.factories import SalesLedgerFactory
@@ -34,10 +33,12 @@ class TestPayment(TestCase):
 
     def setUp(self):
         init_app_pay()
-        stock = make_product_type('Stock', 'stock')
-        stationery = make_product_category('Stationery', 'stationery', stock)
-        self.pencil = make_product(
-            'Pencil', 'pencil', Decimal('1.32'), stationery
+        stock = ProductType.objects.create_product_type('stock', 'Stock')
+        stationery = ProductCategory.objects.create_product_category(
+            'stationery', 'Stationery', stock
+        )
+        self.pencil = Product.objects.create_product(
+            'pencil', 'Pencil', '', Decimal('1.32'), stationery
         )
 
     def _get_payment(self):
