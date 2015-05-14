@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.conf import settings
 
-from mail.service import init_mail_template
+from mail.models import MailTemplate
 
 from pay.models import PaymentState
 from pay.tests.model_maker import make_payment_state
@@ -28,7 +28,7 @@ def init_app_pay():
     _init_payment_state('Later', PaymentState.LATER)
     _init_payment_state('Paid', PaymentState.PAID)
     # for the description, check 'mail_template_context' in 'pay.models'
-    init_mail_template(
+    MailTemplate.objects.init_mail_template(
         PAYMENT_LATER,
         'Thank you for your application',
         (
@@ -42,7 +42,7 @@ def init_app_pay():
         subject='Thank you for your application',
         description="We will contact you to arrange payment.",
     )
-    init_mail_template(
+    MailTemplate.objects.init_mail_template(
         PAYMENT_THANKYOU,
         'Thank you for your payment',
         (
