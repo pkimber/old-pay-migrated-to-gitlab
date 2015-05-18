@@ -46,6 +46,22 @@ class PaymentState(TimeStampedModel):
 reversion.register(PaymentState)
 
 
+class PaymentManager(models.Manager):
+
+    def create_payment(
+            self, name, email, title, quantity, price, content_object):
+        obj = self.model(
+            content_object=content_object,
+            email=email,
+            name=name,
+            price=price,
+            quantity=quantity,
+            title=title,
+        )
+        obj.save()
+        return obj
+
+
 class Payment(TimeStampedModel):
     """List of payments."""
 
@@ -67,6 +83,7 @@ class Payment(TimeStampedModel):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
+    objects = PaymentManager()
 
     class Meta:
         ordering = ('pk',)
