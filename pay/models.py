@@ -105,7 +105,7 @@ class Payment(TimeStampedModel):
             result.append('{} ({} x £{:.2f})'.format(
                 line.product.name,
                 line.quantity.normalize(),
-                line.price
+                line.save_price,
             ))
         return result
 
@@ -120,9 +120,10 @@ class Payment(TimeStampedModel):
     def total(self):
         result = Decimal()
         for line in self.paymentline_set.all():
-            result = result + line.price * line.quantity
+            result = result + line.save_price * line.quantity
         return result
 
+    @property
     def check_can_pay(self):
         allowed = (PaymentState.DUE, PaymentState.FAIL, PaymentState.LATER)
         if not self.state.slug in allowed:
@@ -225,15 +226,14 @@ reversion.register(Payment)
 class PaymentLineManager(models.Manager):
 
     def create_payment_line(
-            self, payment, product, quantity, units, vat_rate):
+            self, payment, product, quantity, units, vat_code):
         obj = self.model(
             payment=payment,
             product=product,
             line_number=payment.get_next_line_number(),
             quantity=quantity,
-            #price=price,
             units=units,
-            vat_rate=vat_rate,
+            vat_code=vat_code,
         )
         obj.save()
         return obj
@@ -297,10 +297,11 @@ class PaymentLine(TimeStampedModel):
         Originally copied from 'InvoiceLine'.
 
         """
-        # copy the current price of the product into the 'price' field
-        self.price = self.product.price
-        self.net = self.price * self.quantity
-        self.vat = self.price * self.quantity * self.vat_rate
+        # copy the current price and vat rate into the 'save' fields
+        self.save_price = self.product.price
+        self.save_vat_rate = self.vat_code.rate
+        self.net = self.save_price * self.quantity
+        self.vat = self.save_price * self.quantity * self.save_vat_rate
         # Call the "real" save() method.
         super(PaymentLine, self).save(*args, **kwargs)
 

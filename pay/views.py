@@ -85,7 +85,7 @@ def _send_notification_email(payment, request):
 def pay_later_view(request, pk):
     payment = Payment.objects.get(pk=pk)
     _check_perm(request, payment)
-    payment.check_can_pay()
+    payment.check_can_pay
     payment.set_pay_later()
     queue_mail_template(
         payment,
@@ -171,7 +171,7 @@ class StripeFormViewMixin(object):
     def get_context_data(self, **kwargs):
         context = super(StripeFormViewMixin, self).get_context_data(**kwargs)
         _check_perm(self.request, self.object)
-        self.object.check_can_pay()
+        self.object.check_can_pay
         context.update(dict(
             currency=CURRENCY,
             description=self.object.description,

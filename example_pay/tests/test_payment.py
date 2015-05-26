@@ -9,6 +9,7 @@ from django.db import IntegrityError
 from django.test.client import RequestFactory
 from django.utils import timezone
 
+from finance.tests.factories import VatSettingsFactory
 from pay.models import (
     PayError,
     Payment,
@@ -26,10 +27,11 @@ from example_pay.tests.factories import SalesLedgerFactory
 
 @pytest.mark.django_db
 def test_check_can_pay():
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory()
     payment = sales_ledger.create_payment()
     try:
-        payment.check_can_pay()
+        payment.check_can_pay
         pass
     except PayError:
         assert False, 'payment is due - so can be paid'
@@ -37,6 +39,7 @@ def test_check_can_pay():
 
 @pytest.mark.django_db
 def test_check_can_pay_not():
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory()
     payment = sales_ledger.create_payment()
     payment.set_paid()
@@ -47,6 +50,7 @@ def test_check_can_pay_not():
 @pytest.mark.django_db
 def test_check_can_pay_too_early():
     """This should never happen... but test anyway."""
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory()
     payment = sales_ledger.create_payment()
     payment.created = timezone.now() + relativedelta(hours=+1, minutes=+2)
@@ -57,6 +61,7 @@ def test_check_can_pay_too_early():
 
 @pytest.mark.django_db
 def test_check_can_pay_too_late():
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory()
     payment = sales_ledger.create_payment()
     payment.created = timezone.now() + relativedelta(hours=-1, minutes=-3)
@@ -67,6 +72,7 @@ def test_check_can_pay_too_late():
 
 @pytest.mark.django_db
 def test_mail_template_context():
+    VatSettingsFactory()
     product = ProductFactory(name='Colour Pencils', price=Decimal('10.00'))
     sales_ledger = SalesLedgerFactory(
         email='test@pkimber.net',
@@ -85,6 +91,7 @@ def test_mail_template_context():
 
 @pytest.mark.django_db
 def test_make_payment():
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory()
     sales_ledger.create_payment()
 
@@ -92,12 +99,14 @@ def test_make_payment():
 @pytest.mark.django_db
 def test_no_content_object():
     """Payments must be linked to a content object."""
+    VatSettingsFactory()
     with pytest.raises(IntegrityError):
-        PaymentFactory
+        PaymentFactory()
 
 
 @pytest.mark.django_db
 def test_notification_message():
+    VatSettingsFactory()
     payment = PaymentFactory(content_object=SalesLedgerFactory())
     product = ProductFactory(name='Paintbrush')
     PaymentLineFactory(payment=payment, product=product)
@@ -112,6 +121,7 @@ def test_notification_message():
 
 @pytest.mark.django_db
 def test_set_paid():
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory(title='Carol')
     assert not sales_ledger.is_paid
     payment = sales_ledger.create_payment()
@@ -127,6 +137,7 @@ def test_set_paid():
 
 @pytest.mark.django_db
 def test_set_payment_failed():
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory(title='Carol')
     assert not sales_ledger.is_paid
     payment = sales_ledger.create_payment()
@@ -142,6 +153,7 @@ def test_set_payment_failed():
 
 @pytest.mark.django_db
 def test_total():
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory(
         product=ProductFactory(price=Decimal('2.50')),
         quantity=Decimal('2'),
@@ -152,7 +164,8 @@ def test_total():
 
 @pytest.mark.django_db
 def test_unique_together():
+    VatSettingsFactory()
     sales_ledger = SalesLedgerFactory()
     sales_ledger.create_payment()
     with pytest.raises(IntegrityError):
-        sales_ledger.create_payment,
+        sales_ledger.create_payment()

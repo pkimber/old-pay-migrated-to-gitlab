@@ -9,7 +9,7 @@ from decimal import Decimal
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('finance', '0002_auto_20150526_0949'),
+        ('finance', '0002_auto_20150526_1127'),
         ('stock', '0001_initial'),
         ('pay', '0003_auto_20141115_1119'),
     ]

@@ -3,6 +3,7 @@ from decimal import Decimal
 
 import factory
 
+from finance.models import VatSettings
 from pay.models import (
     Payment,
     PaymentLine,
@@ -41,7 +42,10 @@ class PaymentLineFactory(factory.django.DjangoModelFactory):
     payment = factory.SubFactory(PaymentFactory)
     product = factory.SubFactory(ProductFactory)
     quantity = Decimal('1')
-    vat_rate = Decimal('0.20')
+
+    @factory.lazy_attribute
+    def vat_code(self):
+        return VatSettings.objects.settings().standard_vat_code
 
     @factory.sequence
     def line_number(n):

@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from example_pay.tests.factories import SalesLedgerFactory
+from finance.tests.factories import VatSettingsFactory
 from login.tests.factories import TEST_PASSWORD
 from login.tests.scenario import (
     default_scenario_login,
@@ -27,6 +28,7 @@ class TestView(TestCase):
     """
 
     def setUp(self):
+        VatSettingsFactory()
         Notify.objects.create_notify('test@pkimber.net')
         default_scenario_login()
         init_app_pay()

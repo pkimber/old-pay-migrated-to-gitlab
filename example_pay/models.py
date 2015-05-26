@@ -4,8 +4,8 @@ from decimal import Decimal
 from django.core.urlresolvers import reverse
 from django.db import models
 
+from finance.models import VatSettings
 from stock.models import Product
-
 from pay.models import (
     default_payment_state,
     Payment,
@@ -62,13 +62,13 @@ class SalesLedger(models.Model):
 
         """
         payment = Payment.objects.create_payment(self.title, self.email, self)
+        vat_settings = VatSettings.objects.settings()
         PaymentLine.objects.create_payment_line(
             payment=payment,
             product=self.product,
             quantity=self.quantity,
-            #price=self.product.price,
             units='each',
-            vat_rate=Decimal('0.20'),
+            vat_code=vat_settings.standard_vat_code,
         )
         return payment
 
