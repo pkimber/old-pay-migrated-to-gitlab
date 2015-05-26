@@ -55,14 +55,15 @@ reversion.register(PaymentState)
 class PaymentManager(models.Manager):
 
     def create_payment(self, name, email, content_object):
-        #self, name, email, title, quantity, price, content_object):
+        """Create a payment.
+
+        - 'name' is the name of the customer.
+
+        """
         obj = self.model(
             content_object=content_object,
             email=email,
             name=name,
-            #price=price,
-            #quantity=quantity,
-            #title=title,
         )
         obj.save()
         return obj
@@ -281,7 +282,7 @@ class PaymentLine(TimeStampedModel):
 
     def __str__(self):
         return "{} {} {} @{}".format(
-            self.line_number, self.quantity, self.description, self.price
+            self.line_number, self.quantity, self.product.name, self.save_price
         )
 
     def clean(self):
