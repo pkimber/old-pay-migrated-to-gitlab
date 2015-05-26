@@ -4,12 +4,13 @@ from decimal import Decimal
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 
+from example_pay.tests.factories import SalesLedgerFactory
 from login.tests.factories import TEST_PASSWORD
 from login.tests.scenario import (
     default_scenario_login,
     get_user_web,
 )
-from mail.tests.model_maker import make_notify
+from mail.models import Notify
 from stock.models import (
     Product,
     ProductCategory,
@@ -17,8 +18,6 @@ from stock.models import (
 )
 from pay.service import init_app_pay
 from pay.views import PAYMENT_PK
-
-from example_pay.tests.model_maker import make_sales_ledger
 
 
 class TestView(TestCase):
@@ -28,10 +27,9 @@ class TestView(TestCase):
     """
 
     def setUp(self):
-        init_app_pay()
-        make_notify('test@pkimber.net')
+        Notify.objects.create_notify('test@pkimber.net')
         default_scenario_login()
-        #default_scenario_pay()
+        init_app_pay()
         self.web = get_user_web()
         self.assertTrue(self.client.login(
             username=self.web.username,
@@ -45,8 +43,9 @@ class TestView(TestCase):
         pencil = Product.objects.create_product(
             'pencil', 'Pencil', '', Decimal('1.32'), stationery
         )
-        sales_ledger = make_sales_ledger(
-            'test@pkimber.net', 'Joan', pencil, 2
+        sales_ledger = SalesLedgerFactory(
+            product=pencil,
+            quantity=Decimal('2'),
         )
         self.payment = sales_ledger.create_payment()
         self.payment.save()
@@ -76,7 +75,6 @@ class TestView(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_stripe(self):
-        #payment = Payment.objects.get(email='test@pkimber.net')
         self._set_session_payment_pk(self.payment.pk)
         response = self.client.get(
             reverse('example.pay.stripe', kwargs=dict(pk=self.payment.pk))

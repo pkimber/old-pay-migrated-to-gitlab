@@ -1,4 +1,6 @@
 # -*- encoding: utf-8 -*-
+from decimal import Decimal
+
 from django.core.urlresolvers import reverse
 from django.db import models
 
@@ -7,8 +9,22 @@ from stock.models import Product
 from pay.models import (
     default_payment_state,
     Payment,
+    PaymentLine,
     PaymentState,
 )
+
+
+class SalesLedgerManager(models.Manager):
+
+    def create_sales_ledger(self, email, title, product, quantity):
+        obj = self.model(
+            email=email,
+            title=title,
+            product=product,
+            quantity=quantity,
+        )
+        obj.save()
+        return obj
 
 
 class SalesLedger(models.Model):
@@ -22,6 +38,7 @@ class SalesLedger(models.Model):
         PaymentState,
         default=default_payment_state,
     )
+    objects = SalesLedgerManager()
 
     class Meta:
         ordering = ('pk',)
@@ -39,14 +56,21 @@ class SalesLedger(models.Model):
         return False
 
     def create_payment(self):
-        return Payment(**dict(
-            content_object=self,
-            email=self.email,
-            name=self.title,
-            price=self.product.price,
+        """Example payment.
+
+        Note: Must be called from within a transaction.
+
+        """
+        payment = Payment.objects.create_payment(self.title, self.email, self)
+        PaymentLine.objects.create_payment_line(
+            payment=payment,
+            product=self.product,
             quantity=self.quantity,
-            title=self.product.name,
-        ))
+            #price=self.product.price,
+            units='each',
+            vat_rate=Decimal('0.20'),
+        )
+        return payment
 
     @property
     def is_paid(self):

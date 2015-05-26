@@ -1,179 +1,158 @@
 # -*- encoding: utf-8 -*-
+import pytest
+
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 from django.core.urlresolvers import reverse
 from django.db import IntegrityError
-from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils import timezone
-
-from base.tests.model_maker import clean_and_save
 
 from pay.models import (
     PayError,
     Payment,
     PaymentState,
 )
-from pay.tests.factories import PaymentFactory
-from pay.tests.model_maker import make_payment
-from pay.service import init_app_pay
-from stock.models import (
-    Product,
-    ProductCategory,
-    ProductType,
+from pay.tests.factories import (
+    PaymentFactory,
+    PaymentLineFactory,
 )
+from stock.tests.factories import ProductFactory
 
 from example_pay.models import SalesLedger
 from example_pay.tests.factories import SalesLedgerFactory
-from example_pay.tests.model_maker import make_sales_ledger
 
 
-class TestPayment(TestCase):
+@pytest.mark.django_db
+def test_check_can_pay():
+    sales_ledger = SalesLedgerFactory()
+    payment = sales_ledger.create_payment()
+    try:
+        payment.check_can_pay()
+        pass
+    except PayError:
+        assert False, 'payment is due - so can be paid'
 
-    def setUp(self):
-        init_app_pay()
-        stock = ProductType.objects.create_product_type('stock', 'Stock')
-        stationery = ProductCategory.objects.create_product_category(
-            'stationery', 'Stationery', stock
-        )
-        self.pencil = Product.objects.create_product(
-            'pencil', 'Pencil', '', Decimal('1.32'), stationery
-        )
 
-    def _get_payment(self):
-        return Payment.objects.get(email='test@pkimber.net')
+@pytest.mark.django_db
+def test_check_can_pay_not():
+    sales_ledger = SalesLedgerFactory()
+    payment = sales_ledger.create_payment()
+    payment.set_paid()
+    with pytest.raises(PayError):
+        payment.check_can_pay
 
-    def _make_payment(self, line):
-        return make_payment(
-            'Mr Patrick Kimber',
-            'test@pkimber.net',
-            'Colour pencils',
-            1,
-            Decimal('10.00'),
-            line,
-            '/url/after/',
-            '/url/fail/',
-        )
 
-    def test_check_can_pay(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        payment = self._make_payment(line)
-        try:
-            payment.check_can_pay()
-            pass
-        except PayError:
-            self.fail('payment is due - so can be paid')
+@pytest.mark.django_db
+def test_check_can_pay_too_early():
+    """This should never happen... but test anyway."""
+    sales_ledger = SalesLedgerFactory()
+    payment = sales_ledger.create_payment()
+    payment.created = timezone.now() + relativedelta(hours=+1, minutes=+2)
+    payment.save()
+    with pytest.raises(PayError):
+        payment.check_can_pay
 
-    def test_check_can_pay_not(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        payment = self._make_payment(line)
-        payment.set_paid()
-        self.assertRaises(
-            PayError,
-            payment.check_can_pay
-        )
 
-    def test_check_can_pay_too_early(self):
-        """This should never happen... but test anyway."""
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        payment = self._make_payment(line)
-        payment.created = timezone.now() + relativedelta(hours=+1, minutes=+2)
-        payment.save()
-        self.assertRaises(
-            PayError,
-            payment.check_can_pay
-        )
+@pytest.mark.django_db
+def test_check_can_pay_too_late():
+    sales_ledger = SalesLedgerFactory()
+    payment = sales_ledger.create_payment()
+    payment.created = timezone.now() + relativedelta(hours=-1, minutes=-3)
+    payment.save()
+    with pytest.raises(PayError):
+        payment.check_can_pay
 
-    def test_check_can_pay_too_late(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        payment = self._make_payment(line)
-        payment.created = timezone.now() + relativedelta(hours=-1, minutes=-3)
-        payment.save()
-        self.assertRaises(
-            PayError,
-            payment.check_can_pay
-        )
 
-    def test_mail_template_context(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        payment = self._make_payment(line)
-        self.assertEqual(
-            {
-                'test@pkimber.net': dict(
-                    description='Colour pencils (1 x £10.00)',
-                    name='Mr Patrick Kimber',
-                    total='£10.00',
-                ),
-            },
-            payment.mail_template_context(),
-        )
+@pytest.mark.django_db
+def test_mail_template_context():
+    product = ProductFactory(name='Colour Pencils', price=Decimal('10.00'))
+    sales_ledger = SalesLedgerFactory(
+        email='test@pkimber.net',
+        title='Mr Patrick Kimber',
+        product=product,
+    )
+    payment = sales_ledger.create_payment()
+    assert {
+        'test@pkimber.net': dict(
+            description='Colour Pencils (1 x £10.00)',
+            name='Mr Patrick Kimber',
+            total='£10.00',
+        ),
+    } == payment.mail_template_context()
 
-    def test_make_payment(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        self._make_payment(line)
 
-    def test_no_content_object(self):
-        """Payments must be linked to a content object."""
-        payment = Payment(**dict(quantity=Decimal(2), url='/after/'))
-        self.assertRaises(
-            IntegrityError,
-            clean_and_save,
-            payment,
-        )
+@pytest.mark.django_db
+def test_make_payment():
+    sales_ledger = SalesLedgerFactory()
+    sales_ledger.create_payment()
 
-    def test_notification_message(self):
-        payment = PaymentFactory(content_object=SalesLedgerFactory())
-        payment.set_paid()
-        factory = RequestFactory()
-        request = factory.get(reverse('project.home'))
-        subject, message = payment.mail_subject_and_message(request)
-        self.assertIn('payment received from Mr', message)
-        self.assertIn('Purchase ref', message)
-        self.assertIn('http://testserver/', message)
 
-    def test_set_paid(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        self.assertFalse(line.is_paid)
-        payment = self._make_payment(line)
-        self.assertFalse(payment.is_paid)
-        payment.set_paid()
-        payment = self._get_payment()
-        self.assertTrue(payment.is_paid)
-        line = SalesLedger.objects.get(title='Carol')
-        self.assertTrue(line.is_paid)
+@pytest.mark.django_db
+def test_no_content_object():
+    """Payments must be linked to a content object."""
+    with pytest.raises(IntegrityError):
+        PaymentFactory
 
-    def test_set_payment_failed(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        self.assertFalse(line.is_paid)
-        payment = self._make_payment(line)
-        self.assertFalse(payment.is_paid)
-        payment.set_payment_failed()
-        payment = self._get_payment()
-        self.assertFalse(payment.is_paid)
-        line = SalesLedger.objects.get(title='Carol')
-        self.assertFalse(line.is_paid)
-        self.assertEqual(PaymentState.FAIL, payment.state.slug)
 
-    def test_total(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        payment = make_payment(
-            'Carol C',
-            'test@pkimber.net',
-            'Colour pencils',
-            2,
-            Decimal('1.32'),
-            line,
-            '/url/after/',
-            '/url/fail/',
-        )
-        self.assertEqual(Decimal('2.64'), payment.total)
+@pytest.mark.django_db
+def test_notification_message():
+    payment = PaymentFactory(content_object=SalesLedgerFactory())
+    product = ProductFactory(name='Paintbrush')
+    PaymentLineFactory(payment=payment, product=product)
+    payment.set_paid()
+    factory = RequestFactory()
+    request = factory.get(reverse('project.home'))
+    subject, message = payment.mail_subject_and_message(request)
+    assert 'payment received from Mr' in message
+    assert 'Paintbrush' in message
+    assert 'http://testserver/' in message
 
-    def test_unique_together(self):
-        line = make_sales_ledger('test@pkimber.net', 'Carol', self.pencil, 3)
-        self._make_payment(line)
-        self.assertRaises(
-            IntegrityError,
-            self._make_payment,
-            line,
-        )
+
+@pytest.mark.django_db
+def test_set_paid():
+    sales_ledger = SalesLedgerFactory(title='Carol')
+    assert not sales_ledger.is_paid
+    payment = sales_ledger.create_payment()
+    assert not payment.is_paid
+    payment.set_paid()
+    # refresh
+    payment = Payment.objects.get(pk=payment.pk)
+    assert payment.is_paid
+    # refresh
+    sales_ledger = SalesLedger.objects.get(title='Carol')
+    assert sales_ledger.is_paid
+
+
+@pytest.mark.django_db
+def test_set_payment_failed():
+    sales_ledger = SalesLedgerFactory(title='Carol')
+    assert not sales_ledger.is_paid
+    payment = sales_ledger.create_payment()
+    assert not payment.is_paid
+    payment.set_payment_failed()
+    # refresh
+    payment = Payment.objects.get(pk=payment.pk)
+    assert not payment.is_paid
+    sales_ledger = SalesLedger.objects.get(title='Carol')
+    assert not sales_ledger.is_paid
+    assert PaymentState.FAIL == payment.state.slug
+
+
+@pytest.mark.django_db
+def test_total():
+    sales_ledger = SalesLedgerFactory(
+        product=ProductFactory(price=Decimal('2.50')),
+        quantity=Decimal('2'),
+    )
+    payment = sales_ledger.create_payment()
+    assert Decimal('5.00') == payment.total
+
+
+@pytest.mark.django_db
+def test_unique_together():
+    sales_ledger = SalesLedgerFactory()
+    sales_ledger.create_payment()
+    with pytest.raises(IntegrityError):
+        sales_ledger.create_payment,

@@ -3,31 +3,14 @@ from django.conf import settings
 
 from mail.models import MailTemplate
 
-from pay.models import PaymentState
-from pay.tests.model_maker import make_payment_state
-
 
 # slug for the email template
 PAYMENT_LATER = 'payment_later'
 PAYMENT_THANKYOU = 'payment_thankyou'
 
 
-def _init_payment_state(name, slug):
-    try:
-        state = PaymentState.objects.get(slug=slug)
-        state.name = name
-        state.save()
-    except PaymentState.DoesNotExist:
-        make_payment_state(name, slug)
-        #print('make_payment_state("{}")'.format(name))
-
-
 def init_app_pay():
-    _init_payment_state('Due', PaymentState.DUE)
-    _init_payment_state('Fail', PaymentState.FAIL)
-    _init_payment_state('Later', PaymentState.LATER)
-    _init_payment_state('Paid', PaymentState.PAID)
-    # for the description, check 'mail_template_context' in 'pay.models'
+    """For the description, check 'mail_template_context' in 'pay.models'."""
     MailTemplate.objects.init_mail_template(
         PAYMENT_LATER,
         'Thank you for your application',

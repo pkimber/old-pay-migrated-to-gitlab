@@ -9,7 +9,7 @@ from django.conf import settings
 
 # Working through:
 # http://docs.celeryproject.org/en/latest/django/first-steps-with-django.html#using-celery-with-django
-app = Celery('example')
+app = Celery('example_pay')
 
 # Config in one of three ways:
 # 1) settings on the app

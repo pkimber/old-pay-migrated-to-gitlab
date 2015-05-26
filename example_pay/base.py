@@ -148,6 +148,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'base',
     'example_pay',
+    'finance',
     'login',
     'mail',
     'pay',

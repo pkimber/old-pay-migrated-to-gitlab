@@ -28,12 +28,12 @@ class ExampleCheckout(UpdateView):
 
     model = SalesLedger
     form_class = ExampleCheckoutForm
+    template_name = 'example/salesledger_form.html'
 
     def form_valid(self, form):
         with transaction.atomic():
             super(ExampleCheckout, self).form_valid(form)
             payment = self.object.create_payment()
-            payment.save()
             payment.url = reverse(
                 'example.payment', kwargs=dict(pk=payment.pk)
             )

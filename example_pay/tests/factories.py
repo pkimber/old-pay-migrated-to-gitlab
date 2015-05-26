@@ -12,3 +12,11 @@ class SalesLedgerFactory(factory.django.DjangoModelFactory):
 
     product = factory.SubFactory(ProductFactory)
     quantity = 1
+
+    @factory.sequence
+    def email(n):
+        return '{:02d}@pkimber.net'.format(n)
+
+    @factory.sequence
+    def title(n):
+        return 'title_{:02d}'.format(n)
