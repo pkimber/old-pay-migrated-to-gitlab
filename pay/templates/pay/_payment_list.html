@@ -1,4 +1,4 @@
-<table class="pure-table pure-table-bordered">
+<table class="pure-table pure-table-bordered" width="100%">
   <thead>
     <tr>
       <th>Customer</th>
@@ -24,28 +24,37 @@
           </small>
         </td>
         <td>
-          {% for line in o.paymentline_set.all %}
-            {{ line.quantity_normalize }} x {{ line.product.name }} @ {{ line.save_price }}
-            <br />
-          {% endfor %}
+          <small>
+            {% for line in o.paymentline_set.all %}
+              {{ line.quantity_normalize }} @ {{ line.save_price }}
+              {{ line.product.name|truncatechars:30 }}
+              <br />
+            {% endfor %}
+          </small>
         </td>
-        <td>
-          {% for line in o.paymentline_set.all %}
-            {{ line.net }}
-            <br />
-          {% endfor %}
+        <td align="right">
+          <small>
+            {% for line in o.paymentline_set.all %}
+              {{ line.net }}
+              <br />
+            {% endfor %}
+          </small>
         </td>
-        <td>
-          {% for line in o.paymentline_set.all %}
-            {{ line.vat }}
-            <br />
-          {% endfor %}
+        <td align="right">
+          <small>
+            {% for line in o.paymentline_set.all %}
+              {{ line.vat }}
+              <br />
+            {% endfor %}
+          </small>
         </td>
-        <td>
-          {% for line in o.paymentline_set.all %}
-            {{ line.gross }}
-            <br />
-          {% endfor %}
+        <td align="right">
+          <small>
+            {% for line in o.paymentline_set.all %}
+              {{ line.gross }}
+              <br />
+            {% endfor %}
+          </small>
           <strong>
             {{ o.total }}
           </strong>

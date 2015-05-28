@@ -31,6 +31,21 @@ class PayError(Exception):
         return repr('%s, %s' % (self.__class__.__name__, self.value))
 
 
+class PaymentStateManager(models.Manager):
+
+    def due(self):
+        return self.model.objects.get(slug=self.model.DUE)
+
+    def fail(self):
+        return self.model.objects.get(slug=self.model.FAIL)
+
+    def later(self):
+        return self.model.objects.get(slug=self.model.LATER)
+
+    def paid(self):
+        return self.model.objects.get(slug=self.model.PAID)
+
+
 class PaymentState(TimeStampedModel):
 
     DUE = 'due'
@@ -40,6 +55,7 @@ class PaymentState(TimeStampedModel):
 
     name = models.CharField(max_length=100)
     slug = models.SlugField(unique=True)
+    objects = PaymentStateManager()
 
     class Meta:
         ordering = ('name',)
@@ -68,6 +84,21 @@ class PaymentManager(models.Manager):
         obj.save()
         return obj
 
+    def payments(self):
+        return self.payments_audit().exclude(
+            state__slug=PaymentState.DUE
+        ).exclude(
+            state__slug=PaymentState.LATER
+        )
+
+    def payments_audit(self):
+        """Select all valid payments for a list of payments."""
+        return self.model.objects.all().order_by(
+            '-pk'
+        ).prefetch_related(
+            'paymentline_set'
+        )
+
 
 class Payment(TimeStampedModel):
     """List of payments."""
@@ -87,6 +118,11 @@ class Payment(TimeStampedModel):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
+    # temporary for data migration
+    # title = models.TextField()
+    # quantity = models.IntegerField()
+    # price = models.DecimalField(max_digits=8, decimal_places=2)
+    # (end of) temporary for data migration
     objects = PaymentManager()
 
     class Meta:

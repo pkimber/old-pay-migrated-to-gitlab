@@ -108,7 +108,10 @@ class PaymentListView(
         LoginRequiredMixin, StaffuserRequiredMixin,
         BaseMixin, ListView):
 
-    model = Payment
+    paginate_by = 20
+
+    def get_queryset(self):
+        return Payment.objects.payments()
 
 
 class StripeFormViewMixin(object):
