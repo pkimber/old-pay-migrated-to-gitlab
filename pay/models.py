@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
 from decimal import Decimal
 
-from django.conf import settings
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
@@ -104,7 +104,7 @@ class Payment(TimeStampedModel):
         result = []
         for line in self.paymentline_set.all():
             s = ''
-            quantity = line.quantity.normalize()
+            quantity = line.quantity_normalize
             if quantity > 1:
                 s = s + '{} x '.format(quantity)
             s = s + '{} (£{:.2f}'.format(
@@ -179,6 +179,10 @@ class Payment(TimeStampedModel):
     def is_pay_later(self):
         return self.state.slug == PaymentState.LATER
 
+    @property
+    def is_payment_failed(self):
+        return self.state.slug == PaymentState.FAIL
+
     def mail_subject_and_message(self, request):
         if self.is_paid:
             caption = 'payment received'
@@ -209,7 +213,7 @@ class Payment(TimeStampedModel):
         }
 
     def save_token(self, token):
-        self.check_can_pay()
+        self.check_can_pay
         self.token = token
         self.save()
 
@@ -316,6 +320,10 @@ class PaymentLine(TimeStampedModel):
     @property
     def gross(self):
         return self.net + self.vat
+
+    @property
+    def quantity_normalize(self):
+        return self.quantity.normalize()
 
 reversion.register(PaymentLine)
 

@@ -51,12 +51,8 @@ class TestView(TestCase):
         )
         self.payment = sales_ledger.create_payment()
         self.payment.save()
-        self.payment.url = reverse(
-            'example.payment', kwargs=dict(pk=self.payment.pk)
-        )
-        self.payment.url_failure = reverse(
-            'example.payment', kwargs=dict(pk=self.payment.pk)
-        )
+        self.payment.url = reverse('pay.list')
+        self.payment.url_failure = reverse('pay.list')
         self.payment.save()
 
     def _set_session_payment_pk(self, pk):
@@ -70,7 +66,7 @@ class TestView(TestCase):
             reverse('example.pay.later', kwargs=dict(pk=self.payment.pk))
         )
         self.assertEqual(response.status_code, 302)
-        self.assertIn('/example/payment/', response.url)
+        self.assertIn('/pay/', response.url)
 
     def test_project_home(self):
         response = self.client.get(reverse('project.home'))

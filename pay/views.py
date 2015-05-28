@@ -7,7 +7,14 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
+from django.views.generic import ListView
 
+from braces.views import (
+    LoginRequiredMixin,
+    StaffuserRequiredMixin,
+)
+
+from base.view_utils import BaseMixin
 from mail.models import Notify
 from mail.service import (
     queue_mail_message,
@@ -95,6 +102,13 @@ def pay_later_view(request, pk):
     _send_notification_email(payment, request)
     process_mail.delay()
     return HttpResponseRedirect(payment.url)
+
+
+class PaymentListView(
+        LoginRequiredMixin, StaffuserRequiredMixin,
+        BaseMixin, ListView):
+
+    model = Payment
 
 
 class StripeFormViewMixin(object):

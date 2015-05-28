@@ -16,7 +16,7 @@ def check_payment(model_instance):
     clean_and_save(payment)
     # can the generic content be paid?
     paid = PaymentState.objects.get(slug=PaymentState.PAID)
-    current = model_instance.payment_state
+    model_instance.payment_state
     model_instance.set_payment_state(paid)
     # the generic content must implement 'get_absolute_url'
     model_instance.get_absolute_url()

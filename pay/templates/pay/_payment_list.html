@@ -1,0 +1,62 @@
+<table class="pure-table pure-table-bordered">
+  <thead>
+    <tr>
+      <th>Customer</th>
+      <th>Description</th>
+      <th>Net</th>
+      <th>VAT</th>
+      <th>Total</th>
+      <th>State</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for o in payment_list %}
+      <tr valign="top">
+        <td>
+          <a href="{{ o.content_object.get_absolute_url }}">
+            {{ o.name }}
+          </a>
+          <br />
+          <small>
+            <a href="mailto:{{ o.email }}">
+              {{ o.email }}
+            </a>
+          </small>
+        </td>
+        <td>
+          {% for line in o.paymentline_set.all %}
+            {{ line.quantity_normalize }} x {{ line.product.name }} @ {{ line.save_price }}
+            <br />
+          {% endfor %}
+        </td>
+        <td>
+          {% for line in o.paymentline_set.all %}
+            {{ line.net }}
+            <br />
+          {% endfor %}
+        </td>
+        <td>
+          {% for line in o.paymentline_set.all %}
+            {{ line.vat }}
+            <br />
+          {% endfor %}
+        </td>
+        <td>
+          {% for line in o.paymentline_set.all %}
+            {{ line.gross }}
+            <br />
+          {% endfor %}
+          <strong>
+            {{ o.total }}
+          </strong>
+        </td>
+        <td>
+          {% if o.is_payment_failed %}
+            <i class="fa fa-warning"></i>
+          {% endif %}
+          {{ o.state.name }}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

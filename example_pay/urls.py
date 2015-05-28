@@ -11,7 +11,6 @@ from pay.views import pay_later_view
 
 from .views import (
     ExampleCheckout,
-    ExamplePaymentDetailView,
     HomeView,
     StripeUpdateView,
 )
@@ -31,6 +30,9 @@ urlpatterns = patterns(
     url(regex=r'^admin/',
         view=include(admin.site.urls)
         ),
+    url(regex=r'^pay/',
+        view=include('pay.urls')
+        ),
     url(r'^home/user/$',
         view=RedirectView.as_view(url=reverse_lazy('project.home')),
         name='project.dash'
@@ -38,10 +40,6 @@ urlpatterns = patterns(
     url(regex=r'^example/checkout/(?P<pk>\d+)/$',
         view=ExampleCheckout.as_view(),
         name='example.checkout'
-        ),
-    url(regex=r'^example/payment/(?P<pk>\d+)/$',
-        view=ExamplePaymentDetailView.as_view(),
-        name='example.payment'
         ),
     url(regex=r'^later/(?P<pk>\d+)/$',
         view=pay_later_view,
