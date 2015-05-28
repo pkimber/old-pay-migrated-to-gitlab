@@ -119,9 +119,9 @@ class Payment(TimeStampedModel):
     object_id = models.PositiveIntegerField()
     content_object = generic.GenericForeignKey()
     # temporary for data migration
-    title = models.TextField()
-    quantity = models.IntegerField()
-    price = models.DecimalField(max_digits=8, decimal_places=2)
+    # title = models.TextField()
+    # quantity = models.IntegerField()
+    # price = models.DecimalField(max_digits=8, decimal_places=2)
     # (end of) temporary for data migration
     objects = PaymentManager()
 
