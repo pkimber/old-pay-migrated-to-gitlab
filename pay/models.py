@@ -103,11 +103,18 @@ class Payment(TimeStampedModel):
     def description(self):
         result = []
         for line in self.paymentline_set.all():
-            result.append('{} ({} x £{:.2f})'.format(
+            s = ''
+            quantity = line.quantity.normalize()
+            if quantity > 1:
+                s = s + '{} x '.format(quantity)
+            s = s + '{} (£{:.2f}'.format(
                 line.product.name,
-                line.quantity.normalize(),
-                line.save_price,
-            ))
+                line.net,
+            )
+            if line.vat:
+                s = s + ' + £{:.2f} vat'.format(line.vat)
+            s = s + ')'
+            result.append(s)
         return result
 
     def _set_payment_state(self, payment_state):
@@ -121,7 +128,7 @@ class Payment(TimeStampedModel):
     def total(self):
         result = Decimal()
         for line in self.paymentline_set.all():
-            result = result + line.save_price * line.quantity
+            result = result + line.gross
         return result
 
     @property
@@ -276,9 +283,9 @@ class PaymentLine(TimeStampedModel):
 
     class Meta:
         ordering = ['line_number',]
+        unique_together = ('payment', 'line_number')
         verbose_name = 'Payment line'
         verbose_name_plural = 'Payment lines'
-        unique_together = ('payment', 'line_number')
 
     def __str__(self):
         return "{} {} {} @{}".format(

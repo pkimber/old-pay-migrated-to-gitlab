@@ -82,9 +82,9 @@ def test_mail_template_context():
     payment = sales_ledger.create_payment()
     assert {
         'test@pkimber.net': dict(
-            description='Colour Pencils (1 x £10.00)',
+            description='Colour Pencils (£10.00 + £2.00 vat)',
             name='Mr Patrick Kimber',
-            total='£10.00',
+            total='£12.00',
         ),
     } == payment.mail_template_context()
 
@@ -159,7 +159,7 @@ def test_total():
         quantity=Decimal('2'),
     )
     payment = sales_ledger.create_payment()
-    assert Decimal('5.00') == payment.total
+    assert Decimal('6.00') == payment.total
 
 
 @pytest.mark.django_db
