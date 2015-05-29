@@ -24,6 +24,10 @@ urlpatterns = patterns(
         view=HomeView.as_view(),
         name='project.home'
         ),
+    url(regex=r'^$',
+        view=HomeView.as_view(),
+        name='project.settings'
+        ),
     url(regex=r'^',
         view=include('login.urls')
         ),
