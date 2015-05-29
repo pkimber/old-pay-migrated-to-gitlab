@@ -1,6 +1,7 @@
 <table class="pure-table pure-table-bordered" width="100%">
   <thead>
     <tr>
+      <th>Date</th>
       <th>Customer</th>
       <th>Description</th>
       <th>Net</th>
@@ -12,6 +13,13 @@
   <tbody>
     {% for o in payment_list %}
       <tr valign="top">
+        <td>
+          <small>
+            {{ o.created|date:'d/m/Y' }}
+            <br />
+            {{ o.created|date:'H:i' }}
+          </small>
+        </td>
         <td>
           {% if o.content_object_url %}
             <a href="{{ o.content_object_url }}">
