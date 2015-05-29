@@ -11,3 +11,6 @@ class TestViewPerm(PermTestCase):
 
     def test_pay_list(self):
         self.assert_staff_only(reverse('pay.list'))
+
+    def test_pay_list_audit(self):
+        self.assert_staff_only(reverse('pay.list.audit'))

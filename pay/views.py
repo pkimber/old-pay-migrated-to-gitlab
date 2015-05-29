@@ -104,11 +104,31 @@ def pay_later_view(request, pk):
     return HttpResponseRedirect(payment.url)
 
 
+class PaymentAuditListView(
+        LoginRequiredMixin, StaffuserRequiredMixin,
+        BaseMixin, ListView):
+
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(dict(audit=True))
+        return context
+
+    def get_queryset(self):
+        return Payment.objects.payments_audit()
+
+
 class PaymentListView(
         LoginRequiredMixin, StaffuserRequiredMixin,
         BaseMixin, ListView):
 
-    paginate_by = 20
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(dict(audit=False))
+        return context
 
     def get_queryset(self):
         return Payment.objects.payments()
