@@ -235,7 +235,7 @@ class StripeFormViewMixin(object):
                 amount=self.object.total_as_pennies(), # amount in pennies, again
                 currency=CURRENCY,
                 customer=customer_id,
-                description=self.object.description,
+                description=', '.join(self.object.description),
             )
             with transaction.atomic():
                 self.object.set_paid()

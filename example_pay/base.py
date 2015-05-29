@@ -201,6 +201,14 @@ CAPTCHA_LETTER_ROTATION = None
 CAPTCHA_NOISE_FUNCTIONS = None
 CAPTCHA_TEST_MODE = True
 
+# Celery
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# https://kfalck.net/2013/02/21/run-multiple-celeries-on-a-single-redis
+CELERY_DEFAULT_QUEUE = 'pay'
+# http://celery.readthedocs.org/en/latest/userguide/tasks.html#disable-rate-limits-if-they-re-not-used
+CELERY_DISABLE_RATE_LIMITS = True
+
 # django-compressor
 COMPRESS_ENABLED = False # defaults to the opposite of DEBUG
 

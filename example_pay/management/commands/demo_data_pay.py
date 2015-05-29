@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.management.base import BaseCommand
 
 from example_pay.models import SalesLedger
+from finance.models import VatSettings
 from mail.models import Notify
 from stock.models import (
     Product,
@@ -17,6 +18,8 @@ class Command(BaseCommand):
     help = "Create demo data for 'pay'"
 
     def handle(self, *args, **options):
+        vat_settings = VatSettings()
+        vat_settings.save()
         Notify.objects.create_notify('test@pkimber.net')
         stock = ProductType.objects.create_product_type('stock', 'Stock')
         stationery = ProductCategory.objects.create_product_category(
