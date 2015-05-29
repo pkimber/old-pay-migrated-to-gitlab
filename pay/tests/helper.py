@@ -19,8 +19,7 @@ def check_payment(model_instance):
     model_instance.payment_state
     model_instance.set_payment_state(paid)
     # do we have mail templates for paid and pay later?
-    assert model_instance.mail_template_name(PaymentState.LATER)
-    assert model_instance.mail_template_name(PaymentState.PAID)
+    assert model_instance.mail_template_name
     # the generic content must implement 'get_absolute_url'
     model_instance.get_absolute_url()
     # the generic content must implement 'allow_pay_later'

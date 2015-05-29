@@ -256,13 +256,13 @@ class Payment(TimeStampedModel):
         }
 
     @property
-    def mail_template_name(self, payment_state):
+    def mail_template_name(self):
         """Ask the content object which mail template to use.
 
         The 'payment_state' can be 'PaymentState.PAID' or 'PaymentState.LATER'
 
         """
-        return self.content_object.mail_template_name(payment_state)
+        return self.content_object.mail_template_name
 
     def save_token(self, token):
         self.check_can_pay

@@ -84,7 +84,8 @@ class SalesLedger(models.Model):
         due = PaymentState.objects.get(slug=PaymentState.DUE)
         return self.payment_state == due
 
-    def mail_template_name(self, payment_state):
+    @property
+    def mail_template_name(self):
         """Which mail template to use.
 
         We don't allow pay later (see 'allow_pay_later' above).

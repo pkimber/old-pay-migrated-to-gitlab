@@ -96,7 +96,7 @@ def pay_later_view(request, pk):
     payment.set_pay_later()
     queue_mail_template(
         payment,
-        PAYMENT_LATER,
+        payment.mail_template_name,
         payment.mail_template_context(),
     )
     _send_notification_email(payment, request)
@@ -241,7 +241,7 @@ class StripeFormViewMixin(object):
                 self.object.set_paid()
             queue_mail_template(
                 self.object,
-                self.object.mail_template_name(self.state),
+                self.object.mail_template_name,
                 self.object.mail_template_context(),
             )
             _send_notification_email(self.object, self.request)
