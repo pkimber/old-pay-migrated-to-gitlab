@@ -136,6 +136,13 @@ class Payment(TimeStampedModel):
         return '{} = {}'.format(self.description, self.total)
 
     @property
+    def content_object_url(self):
+        try:
+            return self.content_object.get_absolute_url()
+        except AttributeError:
+            return None
+
+    @property
     def description(self):
         result = []
         for line in self.paymentline_set.all():
