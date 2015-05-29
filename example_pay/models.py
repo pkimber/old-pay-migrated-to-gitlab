@@ -10,6 +10,10 @@ from pay.models import (
     PaymentLine,
     PaymentState,
 )
+from pay.service import (
+    PAYMENT_LATER,
+    PAYMENT_THANKYOU,
+)
 
 
 class SalesLedgerManager(models.Manager):
@@ -79,6 +83,14 @@ class SalesLedger(models.Model):
     def can_pay(self):
         due = PaymentState.objects.get(slug=PaymentState.DUE)
         return self.payment_state == due
+
+    def mail_template_name(self, payment_state):
+        """Which mail template to use.
+
+        We don't allow pay later (see 'allow_pay_later' above).
+
+        """
+        return PAYMENT_THANKYOU
 
     def set_payment_state(self, payment_state):
         self.payment_state = payment_state

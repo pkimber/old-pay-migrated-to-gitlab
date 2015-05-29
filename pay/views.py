@@ -241,8 +241,8 @@ class StripeFormViewMixin(object):
                 self.object.set_paid()
             queue_mail_template(
                 self.object,
-                PAYMENT_THANKYOU,
-                self.object.mail_template_context()
+                self.object.mail_template_name(self.state),
+                self.object.mail_template_context(),
             )
             _send_notification_email(self.object, self.request)
             process_mail.delay()
