@@ -7,7 +7,12 @@ from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
-from django.views.generic import ListView
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from braces.views import (
     LoginRequiredMixin,
@@ -22,7 +27,10 @@ from mail.service import (
 )
 from mail.tasks import process_mail
 
-from .forms import StripeForm
+from .forms import (
+    PaymentPlanForm,
+    StripeForm,
+)
 from .models import (
     Payment,
     PaymentPlan,
@@ -135,12 +143,32 @@ class PaymentListView(
         return Payment.objects.payments()
 
 
+class PaymentPlanCreateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, CreateView):
+
+    form_class = PaymentPlanForm
+    model = PaymentPlan
+
+
+class PaymentPlanDetailView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, DetailView):
+
+    model = PaymentPlan
+
+
 class PaymentPlanListView(
         LoginRequiredMixin, StaffuserRequiredMixin,
         BaseMixin, ListView):
 
     model = PaymentPlan
     paginate_by = 10
+
+
+class PaymentPlanUpdateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanForm
+    model = PaymentPlan
 
 
 class StripeFormViewMixin(object):
