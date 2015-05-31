@@ -415,14 +415,17 @@ class PaymentPlan(TimeStampedModel):
     def get_absolute_url(self):
         return reverse('pay.plan.detail', args=[self.pk])
 
+    def intervals(self):
+        return self.paymentplaninterval_set.exclude(deleted=True)
+
 reversion.register(PaymentPlan)
 
 
-class PaymentPlanIntervalManager(models.Manager):
-
-    def current(self):
-        """List of intervals excluding 'deleted'."""
-        return self.model.objects.exclude(deleted=True)
+#class PaymentPlanIntervalManager(models.Manager):
+#
+#    def current(self):
+#        """List of intervals excluding 'deleted'."""
+#        return self.model.objects.exclude(deleted=True)
 
 
 class PaymentPlanInterval(TimeStampedModel):
@@ -431,7 +434,7 @@ class PaymentPlanInterval(TimeStampedModel):
     days_after = models.PositiveIntegerField()
     value = models.DecimalField(max_digits=8, decimal_places=2)
     deleted = models.BooleanField(default=False)
-    objects = PaymentPlanIntervalManager()
+    #objects = PaymentPlanIntervalManager()
 
     class Meta:
         ordering = ('plan__slug', 'days_after')
@@ -440,6 +443,9 @@ class PaymentPlanInterval(TimeStampedModel):
 
     def __str__(self):
         return '{}, {}'.format(self.plan.slug, self.days_after)
+
+    def get_absolute_url(self):
+        return reverse('pay.plan.detail', args=[self.plan.pk])
 
 reversion.register(PaymentPlanInterval)
 

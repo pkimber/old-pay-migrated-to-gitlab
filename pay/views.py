@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
 from django.views.generic import (
     CreateView,
@@ -163,6 +164,17 @@ class PaymentPlanIntervalCreateView(
 
     form_class = PaymentPlanIntervalForm
     model = PaymentPlanInterval
+
+    def _get_payment_plan(self):
+        pk = self.kwargs.get('pk', None)
+        return get_object_or_404(PaymentPlan, pk=pk)
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            self.object.plan = self._get_payment_plan()
+            self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class PaymentPlanIntervalUpdateView(

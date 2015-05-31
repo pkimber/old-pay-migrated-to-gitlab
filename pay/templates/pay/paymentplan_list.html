@@ -43,6 +43,30 @@
                 {{ item.name }}
               </td>
             </tr>
+            {% for interval in item.intervals %}
+              <tr valign="top">
+                <td>
+                  <a href="{% url 'pay.plan.interval.update' interval.pk %}">
+                    <i class="fa fa-edit"></i>
+                    {{ interval.days_after }}
+                  </a>
+                </td>
+                <td>
+                  {{ interval.value }}
+                </td>
+              </tr>
+            {% empty %}
+              <tr valign="top">
+                <td>
+                </td>
+                <td>
+                  <a href="{% url 'pay.plan.interval.create' item.pk %}">
+                    <i class="fa fa-plus"></i>
+                    Create an installment...
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
           {% endfor %}
         </tbody>
       </table>
