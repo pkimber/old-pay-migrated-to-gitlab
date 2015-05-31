@@ -14,7 +14,10 @@ from finance.models import (
     VatCode,
 )
 from base.model_utils import TimeStampedModel
-from stock.models import Product
+from stock.models import (
+    Product,
+    ProductCategory,
+)
 
 
 def default_payment_state():
@@ -378,6 +381,23 @@ class PaymentLine(TimeStampedModel):
         return self.quantity.normalize()
 
 reversion.register(PaymentLine)
+
+
+class PaymentPlanInterval(TimeStampedModel):
+
+    category = models.ForeignKey(ProductCategory)
+    days_after = models.PositiveIntegerField()
+    deleted = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('category', 'days_after')
+        verbose_name = 'Payment plan interval'
+        verbose_name_plural = 'Payment plan intervals'
+
+    def __str__(self):
+        return '{}, {}'.format(self.category.name, self.days_after)
+
+reversion.register(PaymentPlanInterval)
 
 
 class StripeCustomer(TimeStampedModel):

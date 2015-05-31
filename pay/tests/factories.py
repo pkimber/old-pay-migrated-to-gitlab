@@ -7,8 +7,12 @@ from finance.models import VatSettings
 from pay.models import (
     Payment,
     PaymentLine,
+    PaymentPlanInterval,
 )
-from stock.tests.factories import ProductFactory
+from stock.tests.factories import (
+    ProductCategoryFactory,
+    ProductFactory,
+)
 
 
 class PaymentFactory(factory.django.DjangoModelFactory):
@@ -50,3 +54,12 @@ class PaymentLineFactory(factory.django.DjangoModelFactory):
     @factory.sequence
     def line_number(n):
         return n
+
+
+class PaymentPlanIntervalFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = PaymentPlanInterval
+
+    days_after = 10
+    category = factory.SubFactory(ProductCategoryFactory)
