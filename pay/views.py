@@ -160,8 +160,10 @@ class PaymentPlanListView(
         LoginRequiredMixin, StaffuserRequiredMixin,
         BaseMixin, ListView):
 
-    model = PaymentPlan
     paginate_by = 10
+
+    def get_queryset(self):
+        return PaymentPlan.objects.current()
 
 
 class PaymentPlanUpdateView(

@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils import timezone
 
@@ -383,16 +384,25 @@ class PaymentLine(TimeStampedModel):
 reversion.register(PaymentLine)
 
 
+class PaymentPlanManager(models.Manager):
+
+    def current(self):
+        """List of payment plans excluding 'deleted'."""
+        return self.model.objects.exclude(deleted=True)
+
+
 class PaymentPlan(TimeStampedModel):
     """Header record for a payment plan."""
 
     name = models.TextField()
     slug = models.SlugField()
+    deleted = models.BooleanField(default=False)
     #category = models.ForeignKey(ProductCategory)
     #payment = models.ForeignKey(
     #    Payment,
     #    help_text='The plan is initiated with a payment'
     #)
+    objects = PaymentPlanManager()
 
     class Meta:
         ordering = ('slug',)
@@ -401,6 +411,9 @@ class PaymentPlan(TimeStampedModel):
 
     def __str__(self):
         return '{}'.format(self.slug)
+
+    def get_absolute_url(self):
+        return reverse('pay.plan.detail', args=[self.pk])
 
 reversion.register(PaymentPlan)
 

@@ -14,22 +14,23 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentPlan',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('name', models.TextField()),
                 ('slug', models.SlugField()),
+                ('deleted', models.BooleanField(default=False)),
             ],
             options={
-                'verbose_name_plural': 'Payment plan',
                 'verbose_name': 'Payment plan',
+                'verbose_name_plural': 'Payment plan',
                 'ordering': ('slug',),
             },
         ),
         migrations.CreateModel(
             name='PaymentPlanInterval',
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False, verbose_name='ID', auto_created=True)),
+                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('days_after', models.PositiveIntegerField()),
@@ -38,8 +39,8 @@ class Migration(migrations.Migration):
                 ('plan', models.ForeignKey(to='pay.PaymentPlan')),
             ],
             options={
-                'verbose_name_plural': 'Payment plan intervals',
                 'verbose_name': 'Payment plan interval',
+                'verbose_name_plural': 'Payment plan intervals',
                 'ordering': ('plan__slug', 'days_after'),
             },
         ),

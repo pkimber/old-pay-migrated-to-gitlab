@@ -1,0 +1,41 @@
+{% extends 'pay/base.html' %}
+{% load static %}
+
+{% block title %}
+  Payment Plan
+{% endblock title %}
+
+{% block sub_heading %}
+  Payment Plan
+{% endblock sub_heading %}
+
+{% block content %}
+  {% include 'pay/_pay_menu.html' %}
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <table class="pure-table pure-table-bordered">
+        <tbody>
+          <tr valign="top">
+            <td>
+              Slug
+            </td>
+            <td>
+              <a href="{% url 'pay.plan.update' object.pk %}">
+                <i class="fa fa-edit"></i>
+                {{ object.slug }}
+              </a>
+            </td>
+          </tr>
+          <tr valign="top">
+            <td>
+              Name
+            </td>
+            <td>
+              {{ object.name }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock content %}
