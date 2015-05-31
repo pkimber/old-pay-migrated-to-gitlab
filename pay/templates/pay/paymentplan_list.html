@@ -2,19 +2,11 @@
 {% load static %}
 
 {% block title %}
-  {% if audit %}
-    Payment Audit
-  {% else %}
-    Payments
-  {% endif %}
+  Payment Plans
 {% endblock title %}
 
 {% block sub_heading %}
-  {% if audit %}
-    Payment Audit
-  {% else %}
-    Payments
-  {% endif %}
+  Payment Plans
 {% endblock sub_heading %}
 
 {% block content %}
@@ -22,7 +14,6 @@
   <div class="pure-g">
     <div class="pure-u-1">
       {% include 'base/_paginate.html' %}
-      {% include 'pay/_payment_list.html' %}
       {% include 'base/_paginate.html' %}
     </div>
   </div>

@@ -25,6 +25,7 @@ from mail.tasks import process_mail
 from .forms import StripeForm
 from .models import (
     Payment,
+    PaymentPlan,
     StripeCustomer,
 )
 from .service import (
@@ -132,6 +133,14 @@ class PaymentListView(
 
     def get_queryset(self):
         return Payment.objects.payments()
+
+
+class PaymentPlanListView(
+        LoginRequiredMixin, StaffuserRequiredMixin,
+        BaseMixin, ListView):
+
+    model = PaymentPlan
+    paginate_by = 10
 
 
 class StripeFormViewMixin(object):
