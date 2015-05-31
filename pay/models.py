@@ -383,6 +383,28 @@ class PaymentLine(TimeStampedModel):
 reversion.register(PaymentLine)
 
 
+class PaymentPlan(TimeStampedModel):
+    """Header record for a payment plan."""
+
+    name = models.TextField()
+    slug = models.SlugField()
+    #category = models.ForeignKey(ProductCategory)
+    #payment = models.ForeignKey(
+    #    Payment,
+    #    help_text='The plan is initiated with a payment'
+    #)
+
+    class Meta:
+        ordering = ('slug',)
+        verbose_name = 'Payment plan'
+        verbose_name_plural = 'Payment plan'
+
+    def __str__(self):
+        return '{}'.format(self.slug)
+
+reversion.register(PaymentPlan)
+
+
 class PaymentPlanIntervalManager(models.Manager):
 
     def current(self):
@@ -392,18 +414,19 @@ class PaymentPlanIntervalManager(models.Manager):
 
 class PaymentPlanInterval(TimeStampedModel):
 
-    category = models.ForeignKey(ProductCategory)
+    plan = models.ForeignKey(PaymentPlan)
     days_after = models.PositiveIntegerField()
+    value = models.DecimalField(max_digits=8, decimal_places=2)
     deleted = models.BooleanField(default=False)
     objects = PaymentPlanIntervalManager()
 
     class Meta:
-        ordering = ('category', 'days_after')
+        ordering = ('plan__slug', 'days_after')
         verbose_name = 'Payment plan interval'
         verbose_name_plural = 'Payment plan intervals'
 
     def __str__(self):
-        return '{}, {}'.format(self.category.name, self.days_after)
+        return '{}, {}'.format(self.plan.slug, self.days_after)
 
 reversion.register(PaymentPlanInterval)
 
