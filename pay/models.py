@@ -383,11 +383,19 @@ class PaymentLine(TimeStampedModel):
 reversion.register(PaymentLine)
 
 
+class PaymentPlanIntervalManager(models.Manager):
+
+    def current(self):
+        """List of intervals excluding 'deleted'."""
+        return self.model.objects.exclude(deleted=True)
+
+
 class PaymentPlanInterval(TimeStampedModel):
 
     category = models.ForeignKey(ProductCategory)
     days_after = models.PositiveIntegerField()
     deleted = models.BooleanField(default=False)
+    objects = PaymentPlanIntervalManager()
 
     class Meta:
         ordering = ('category', 'days_after')
