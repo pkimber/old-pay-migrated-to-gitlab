@@ -4,6 +4,7 @@ from django import forms
 from .models import (
     Payment,
     PaymentPlan,
+    PaymentPlanInterval,
 )
 
 
@@ -27,6 +28,16 @@ class PaymentPlanForm(forms.ModelForm):
         fields = (
             'slug',
             'name',
+        )
+
+
+class PaymentPlanIntervalForm(forms.ModelForm):
+
+    class Meta:
+        model = PaymentPlanInterval
+        fields = (
+            'days_after',
+            'value',
         )
 
 

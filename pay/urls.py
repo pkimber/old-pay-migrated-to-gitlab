@@ -9,6 +9,8 @@ from .views import (
     PaymentListView,
     PaymentPlanCreateView,
     PaymentPlanDetailView,
+    PaymentPlanIntervalCreateView,
+    PaymentPlanIntervalUpdateView,
     PaymentPlanListView,
     PaymentPlanUpdateView,
 )
@@ -39,5 +41,13 @@ urlpatterns = patterns(
     url(regex=r'^plan/(?P<pk>\d+)/update/$',
         view=PaymentPlanUpdateView.as_view(),
         name='pay.plan.update'
+        ),
+    url(regex=r'^plan/(?P<pk>\d+)/interval/create/$',
+        view=PaymentPlanIntervalCreateView.as_view(),
+        name='pay.plan.interval.create'
+        ),
+    url(regex=r'^plan/interval/(?P<pk>\d+)/update/$',
+        view=PaymentPlanIntervalUpdateView.as_view(),
+        name='pay.plan.interval.update'
         ),
 )

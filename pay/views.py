@@ -29,11 +29,13 @@ from mail.tasks import process_mail
 
 from .forms import (
     PaymentPlanForm,
+    PaymentPlanIntervalForm,
     StripeForm,
 )
 from .models import (
     Payment,
     PaymentPlan,
+    PaymentPlanInterval,
     StripeCustomer,
 )
 from .service import (
@@ -154,6 +156,20 @@ class PaymentPlanDetailView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, DetailView):
 
     model = PaymentPlan
+
+
+class PaymentPlanIntervalCreateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, CreateView):
+
+    form_class = PaymentPlanIntervalForm
+    model = PaymentPlanInterval
+
+
+class PaymentPlanIntervalUpdateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanIntervalForm
+    model = PaymentPlanInterval
 
 
 class PaymentPlanListView(

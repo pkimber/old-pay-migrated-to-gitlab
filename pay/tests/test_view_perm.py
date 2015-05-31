@@ -3,7 +3,10 @@ from django.core.urlresolvers import reverse
 
 from base.tests.test_utils import PermTestCase
 
-from .factories import PaymentPlanFactory
+from .factories import (
+    PaymentPlanFactory,
+    PaymentPlanIntervalFactory,
+)
 
 
 class TestViewPerm(PermTestCase):
@@ -17,6 +20,18 @@ class TestViewPerm(PermTestCase):
     def test_pay_detail(self):
         plan = PaymentPlanFactory()
         self.assert_staff_only(reverse('pay.plan.detail', args=[plan.pk]))
+
+    def test_pay_interval_create(self):
+        plan = PaymentPlanFactory()
+        self.assert_staff_only(
+            reverse('pay.plan.interval.create', args=[plan.pk])
+        )
+
+    def test_pay_interval_update(self):
+        interval = PaymentPlanIntervalFactory()
+        self.assert_staff_only(
+            reverse('pay.plan.interval.update', args=[interval.pk])
+        )
 
     def test_pay_list(self):
         self.assert_staff_only(reverse('pay.plan.list'))
