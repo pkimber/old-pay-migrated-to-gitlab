@@ -517,6 +517,10 @@ class PaymentPlanAudit(models.Model):
         verbose_name_plural = 'Payment plan audit'
 
     def __str__(self):
-        return '{}, {}'.format(self.contact.full_name, self.template.slug)
+        return '{}, {}, {}'.format(
+            self.payment_plan.payment_plan_header.slug,
+            self.payment_interval.days_after,
+            self.payment_interval.value,
+        )
 
 reversion.register(PaymentPlanAudit)

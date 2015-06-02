@@ -64,10 +64,6 @@ class PaymentPlanAuditFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = PaymentPlanAudit
 
-    @factory.sequence
-    def name(n):
-        return 'audit_{:02d}'.format(n)
-
 
 class PaymentPlanHeaderFactory(factory.django.DjangoModelFactory):
 
@@ -75,8 +71,12 @@ class PaymentPlanHeaderFactory(factory.django.DjangoModelFactory):
         model = PaymentPlanHeader
 
     @factory.sequence
+    def slug(n):
+        return 'header_slug_{:02d}'.format(n)
+
+    @factory.sequence
     def name(n):
-        return 'header_{:02d}'.format(n)
+        return 'header_name_{:02d}'.format(n)
 
 
 class PaymentPlanIntervalFactory(factory.django.DjangoModelFactory):
