@@ -395,7 +395,7 @@ class PaymentPlan(TimeStampedModel):
     """Header record for a payment plan."""
 
     name = models.TextField()
-    slug = models.SlugField()
+    slug = models.SlugField(unique=True)
     deleted = models.BooleanField(default=False)
     #category = models.ForeignKey(ProductCategory)
     #payment = models.ForeignKey(

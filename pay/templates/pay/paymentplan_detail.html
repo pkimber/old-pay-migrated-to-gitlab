@@ -12,48 +12,6 @@
 {% block content %}
   {% include 'pay/_pay_menu.html' %}
   <div class="pure-g">
-    <div class="pure-u-1">
-      <table class="pure-table pure-table-bordered">
-        <tbody>
-          <tr valign="top">
-            <td>
-              Slug
-            </td>
-            <td>
-              {% if object.deleted %}
-                <strike>
-                  {{ object.slug }}
-                </strike>
-              {% else %}
-                <a href="{% url 'pay.plan.update' object.pk %}">
-                  <i class="fa fa-edit"></i>
-                  {{ object.slug }}
-                </a>
-              {% endif %}
-            </td>
-          </tr>
-          {% if object.deleted %}
-          <tr valign="top">
-            <td>
-              Status
-            </td>
-            <td>
-              <strong>
-                Deleted
-              </strong>
-            </td>
-          </tr>
-          {% endif %}
-          <tr valign="top">
-            <td>
-              Name
-            </td>
-            <td>
-              {{ object.name }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    {% include 'pay/_paymentplan.html' %}
   </div>
 {% endblock content %}

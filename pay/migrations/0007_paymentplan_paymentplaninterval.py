@@ -14,34 +14,34 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentPlan',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('name', models.TextField()),
-                ('slug', models.SlugField()),
+                ('slug', models.SlugField(unique=True)),
                 ('deleted', models.BooleanField(default=False)),
             ],
             options={
-                'verbose_name': 'Payment plan',
                 'verbose_name_plural': 'Payment plan',
                 'ordering': ('slug',),
+                'verbose_name': 'Payment plan',
             },
         ),
         migrations.CreateModel(
             name='PaymentPlanInterval',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', auto_created=True, serialize=False, primary_key=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', auto_created=True, primary_key=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('days_after', models.PositiveIntegerField()),
-                ('value', models.DecimalField(max_digits=8, decimal_places=2)),
+                ('value', models.DecimalField(decimal_places=2, max_digits=8)),
                 ('deleted', models.BooleanField(default=False)),
                 ('plan', models.ForeignKey(to='pay.PaymentPlan')),
             ],
             options={
-                'verbose_name': 'Payment plan interval',
                 'verbose_name_plural': 'Payment plan intervals',
                 'ordering': ('plan__slug', 'days_after'),
+                'verbose_name': 'Payment plan interval',
             },
         ),
     ]

@@ -179,6 +179,11 @@ class PaymentPlanDetailView(
 
     model = PaymentPlan
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(dict(detail=True))
+        return context
+
 
 class PaymentPlanIntervalCreateView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, CreateView):
@@ -223,8 +228,6 @@ class PaymentPlanIntervalUpdateView(
 class PaymentPlanListView(
         LoginRequiredMixin, StaffuserRequiredMixin,
         BaseMixin, ListView):
-
-    paginate_by = 10
 
     def get_queryset(self):
         return PaymentPlan.objects.current()

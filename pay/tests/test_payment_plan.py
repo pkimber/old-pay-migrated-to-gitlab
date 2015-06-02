@@ -1,6 +1,8 @@
 # -*- encoding: utf-8 -*-
 import pytest
 
+from django.db.utils import IntegrityError
+
 from pay.models import (
     PaymentPlan,
     PaymentPlanInterval,
@@ -32,6 +34,14 @@ def test_payment_plan_intervals():
     PaymentPlanIntervalFactory(plan=plan, days_after=5, deleted=True)
     PaymentPlanIntervalFactory(plan=plan, days_after=7)
     assert [item.days_after for item in plan.intervals()]
+
+
+@pytest.mark.django_db
+def test_plan_slug_unique():
+    PaymentPlanFactory(slug='one')
+    with pytest.raises(IntegrityError) as excinfo:
+        PaymentPlanFactory(slug='one')
+    assert 'UNIQUE constraint failed' in str(excinfo.value)
 
 
 @pytest.mark.django_db
