@@ -30,15 +30,15 @@ from mail.service import (
 from mail.tasks import process_mail
 
 from .forms import (
-    PaymentPlanEmptyForm,
-    PaymentPlanForm,
+    PaymentPlanHeaderEmptyForm,
+    PaymentPlanHeaderForm,
     PaymentPlanIntervalEmptyForm,
     PaymentPlanIntervalForm,
     StripeForm,
 )
 from .models import (
     Payment,
-    PaymentPlan,
+    PaymentPlanHeader,
     PaymentPlanInterval,
     StripeCustomer,
 )
@@ -149,19 +149,19 @@ class PaymentListView(
         return Payment.objects.payments()
 
 
-class PaymentPlanCreateView(
+class PaymentPlanHeaderCreateView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, CreateView):
 
-    form_class = PaymentPlanForm
-    model = PaymentPlan
+    form_class = PaymentPlanHeaderForm
+    model = PaymentPlanHeader
 
 
-class PaymentPlanDeleteView(
+class PaymentPlanHeaderDeleteView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
 
-    form_class = PaymentPlanEmptyForm
-    model = PaymentPlan
-    template_name = 'pay/paymentplan_delete.html'
+    form_class = PaymentPlanHeaderEmptyForm
+    model = PaymentPlanHeader
+    template_name = 'pay/paymentplanheader_delete.html'
 
     def form_valid(self, form):
         with transaction.atomic():
@@ -171,18 +171,35 @@ class PaymentPlanDeleteView(
         return HttpResponseRedirect(self.get_success_url())
 
     def get_success_url(self):
-        return reverse('pay.plan.list')
+        return reverse('pay.plan.header.list')
 
 
-class PaymentPlanDetailView(
+class PaymentPlanHeaderDetailView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, DetailView):
 
-    model = PaymentPlan
+    model = PaymentPlanHeader
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(dict(detail=True))
         return context
+
+
+class PaymentPlanHeaderListView(
+        LoginRequiredMixin, StaffuserRequiredMixin,
+        BaseMixin, ListView):
+
+    paginate_by = 5
+
+    def get_queryset(self):
+        return PaymentPlanHeader.objects.current()
+
+
+class PaymentPlanHeaderUpdateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanHeaderForm
+    model = PaymentPlanHeader
 
 
 class PaymentPlanIntervalCreateView(
@@ -191,14 +208,14 @@ class PaymentPlanIntervalCreateView(
     form_class = PaymentPlanIntervalForm
     model = PaymentPlanInterval
 
-    def _get_payment_plan(self):
+    def _get_payment_plan_header(self):
         pk = self.kwargs.get('pk', None)
-        return get_object_or_404(PaymentPlan, pk=pk)
+        return get_object_or_404(PaymentPlanHeader, pk=pk)
 
     def form_valid(self, form):
         with transaction.atomic():
             self.object = form.save(commit=False)
-            self.object.plan = self._get_payment_plan()
+            self.object.payment_plan_header = self._get_payment_plan_header()
             self.object = form.save()
         return HttpResponseRedirect(self.get_success_url())
 
@@ -223,23 +240,6 @@ class PaymentPlanIntervalUpdateView(
 
     form_class = PaymentPlanIntervalForm
     model = PaymentPlanInterval
-
-
-class PaymentPlanListView(
-        LoginRequiredMixin, StaffuserRequiredMixin,
-        BaseMixin, ListView):
-
-    paginate_by = 5
-
-    def get_queryset(self):
-        return PaymentPlan.objects.current()
-
-
-class PaymentPlanUpdateView(
-        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
-
-    form_class = PaymentPlanForm
-    model = PaymentPlan
 
 
 class StripeFormViewMixin(object):

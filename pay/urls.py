@@ -7,14 +7,14 @@ from django.conf.urls import (
 from .views import (
     PaymentAuditListView,
     PaymentListView,
-    PaymentPlanCreateView,
-    PaymentPlanDeleteView,
-    PaymentPlanDetailView,
+    PaymentPlanHeaderCreateView,
+    PaymentPlanHeaderDeleteView,
+    PaymentPlanHeaderDetailView,
+    PaymentPlanHeaderListView,
+    PaymentPlanHeaderUpdateView,
     PaymentPlanIntervalCreateView,
     PaymentPlanIntervalDeleteView,
     PaymentPlanIntervalUpdateView,
-    PaymentPlanListView,
-    PaymentPlanUpdateView,
 )
 
 
@@ -28,27 +28,27 @@ urlpatterns = patterns(
         view=PaymentAuditListView.as_view(),
         name='pay.list.audit'
         ),
-    url(regex=r'^plan/$',
-        view=PaymentPlanListView.as_view(),
-        name='pay.plan.list'
+    url(regex=r'^plan/header/$',
+        view=PaymentPlanHeaderListView.as_view(),
+        name='pay.plan.header.list'
         ),
-    url(regex=r'^plan/create/$',
-        view=PaymentPlanCreateView.as_view(),
-        name='pay.plan.create'
+    url(regex=r'^plan/header/create/$',
+        view=PaymentPlanHeaderCreateView.as_view(),
+        name='pay.plan.header.create'
         ),
-    url(regex=r'^plan/(?P<pk>\d+)/$',
-        view=PaymentPlanDetailView.as_view(),
-        name='pay.plan.detail'
+    url(regex=r'^plan/header/(?P<pk>\d+)/$',
+        view=PaymentPlanHeaderDetailView.as_view(),
+        name='pay.plan.header.detail'
         ),
-    url(regex=r'^plan/(?P<pk>\d+)/delete/$',
-        view=PaymentPlanDeleteView.as_view(),
-        name='pay.plan.delete'
+    url(regex=r'^plan/header/(?P<pk>\d+)/delete/$',
+        view=PaymentPlanHeaderDeleteView.as_view(),
+        name='pay.plan.header.delete'
         ),
-    url(regex=r'^plan/(?P<pk>\d+)/update/$',
-        view=PaymentPlanUpdateView.as_view(),
-        name='pay.plan.update'
+    url(regex=r'^plan/header/(?P<pk>\d+)/update/$',
+        view=PaymentPlanHeaderUpdateView.as_view(),
+        name='pay.plan.header.update'
         ),
-    url(regex=r'^plan/(?P<pk>\d+)/interval/create/$',
+    url(regex=r'^plan/header/(?P<pk>\d+)/interval/create/$',
         view=PaymentPlanIntervalCreateView.as_view(),
         name='pay.plan.interval.create'
         ),

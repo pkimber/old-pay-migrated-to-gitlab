@@ -384,14 +384,14 @@ class PaymentLine(TimeStampedModel):
 reversion.register(PaymentLine)
 
 
-class PaymentPlanManager(models.Manager):
+class PaymentPlanHeaderManager(models.Manager):
 
     def current(self):
-        """List of payment plans excluding 'deleted'."""
+        """List of payment plan headers excluding 'deleted'."""
         return self.model.objects.exclude(deleted=True)
 
 
-class PaymentPlan(TimeStampedModel):
+class PaymentPlanHeader(TimeStampedModel):
     """Header record for a payment plan."""
 
     name = models.TextField()
@@ -402,23 +402,23 @@ class PaymentPlan(TimeStampedModel):
     #    Payment,
     #    help_text='The plan is initiated with a payment'
     #)
-    objects = PaymentPlanManager()
+    objects = PaymentPlanHeaderManager()
 
     class Meta:
         ordering = ('slug',)
-        verbose_name = 'Payment plan'
-        verbose_name_plural = 'Payment plan'
+        verbose_name = 'Payment plan header'
+        verbose_name_plural = 'Payment plan headers'
 
     def __str__(self):
         return '{}'.format(self.slug)
 
     def get_absolute_url(self):
-        return reverse('pay.plan.detail', args=[self.pk])
+        return reverse('pay.plan.header.detail', args=[self.pk])
 
     def intervals(self):
         return self.paymentplaninterval_set.exclude(deleted=True)
 
-reversion.register(PaymentPlan)
+reversion.register(PaymentPlanHeader)
 
 
 #class PaymentPlanIntervalManager(models.Manager):
@@ -430,22 +430,27 @@ reversion.register(PaymentPlan)
 
 class PaymentPlanInterval(TimeStampedModel):
 
-    plan = models.ForeignKey(PaymentPlan)
+    payment_plan_header = models.ForeignKey(PaymentPlanHeader)
     days_after = models.PositiveIntegerField()
     value = models.DecimalField(max_digits=8, decimal_places=2)
     deleted = models.BooleanField(default=False)
     #objects = PaymentPlanIntervalManager()
 
     class Meta:
-        ordering = ('plan__slug', 'days_after')
+        ordering = ('payment_plan_header__slug', 'days_after')
         verbose_name = 'Payment plan interval'
         verbose_name_plural = 'Payment plan intervals'
 
     def __str__(self):
-        return '{}, {}'.format(self.plan.slug, self.days_after)
+        return '{}, {}'.format(
+            self.payment_plan_header.slug, self.days_after
+        )
 
     def get_absolute_url(self):
-        return reverse('pay.plan.detail', args=[self.plan.pk])
+        return reverse(
+            'pay.plan.header.detail',
+            args=[self.payment_plan_header.pk]
+        )
 
 reversion.register(PaymentPlanInterval)
 
@@ -464,3 +469,54 @@ class StripeCustomer(TimeStampedModel):
         return '{} ({})'.format(self.email, self.customer_id)
 
 reversion.register(StripeCustomer)
+
+
+class PaymentPlan(TimeStampedModel):
+    """The actual record which controls the execution of a payment plan."""
+    payment_plan_header = models.ForeignKey(PaymentPlanHeader)
+    # link to the object in the system which requested the payment plan
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey()
+    #objects = PaymentPlanRunnerManager()
+
+    class Meta:
+        # TODO Check the unique index on the 'content_object'.  Is it correct?
+        unique_together = (
+            'payment_plan_header',
+            'content_type',
+            'object_id',
+        )
+        verbose_name = 'Payment plan run'
+        verbose_name_plural = 'Payment plan run'
+
+    def __str__(self):
+        return '{}'.format(self.slug)
+
+reversion.register(PaymentPlan)
+
+
+class PaymentPlanItem(models.Model):
+    """Record of payments received from an object (client).
+
+    We want to make 100% sure that an object (client) only ever pays an
+    installment once.  We add a record to this table when the payment is
+    received.
+
+    """
+
+    payment_plan = models.ForeignKey(PaymentPlan)
+    payment_interval = models.ForeignKey(PaymentPlanInterval)
+
+    class Meta:
+        unique_together = (
+            'payment_plan',
+            'payment_interval',
+        )
+        verbose_name = 'Payment plan item'
+        verbose_name_plural = 'Payment plan item'
+
+    def __str__(self):
+        return '{}, {}'.format(self.contact.full_name, self.template.slug)
+
+reversion.register(PaymentPlanItem)

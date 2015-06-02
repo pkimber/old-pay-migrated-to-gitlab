@@ -3,7 +3,7 @@ from django import forms
 
 from .models import (
     Payment,
-    PaymentPlan,
+    PaymentPlanHeader,
     PaymentPlanInterval,
 )
 
@@ -15,14 +15,14 @@ class PayLaterForm(forms.ModelForm):
         fields = ()
 
 
-class PaymentPlanEmptyForm(forms.ModelForm):
+class PaymentPlanHeaderEmptyForm(forms.ModelForm):
 
     class Meta:
-        model = PaymentPlan
+        model = PaymentPlanHeader
         fields = ()
 
 
-class PaymentPlanForm(forms.ModelForm):
+class PaymentPlanHeaderForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,7 +31,7 @@ class PaymentPlanForm(forms.ModelForm):
         )
 
     class Meta:
-        model = PaymentPlan
+        model = PaymentPlanHeader
         fields = (
             'slug',
             'name',

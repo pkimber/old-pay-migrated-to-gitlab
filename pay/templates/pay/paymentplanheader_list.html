@@ -19,14 +19,14 @@
     </div>
   {% endif %}
   <div class="pure-g">
-    {% for paymentplan in paymentplan_list %}
-      {% include 'pay/_paymentplan.html' %}
+    {% for payment_plan_header in paymentplanheader_list %}
+      {% include 'pay/_payment_plan_header.html' %}
     {% endfor %}
   </div>
   <div class="pure-menu pure-menu-horizontal">
     <ul class="pure-menu-list">
       <li class="pure-menu-item">
-        <a href="{% url 'pay.plan.create' %}" class="pure-menu-link">
+        <a href="{% url 'pay.plan.header.create' %}" class="pure-menu-link">
           <i class="fa fa-plus"></i>
           Create a new payment plan...
         </a>

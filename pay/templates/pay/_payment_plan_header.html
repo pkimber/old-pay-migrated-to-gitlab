@@ -12,18 +12,18 @@
         <tr valign="top">
           <td>
             {% if detail %}
-            <a href="{% url 'pay.plan.update' paymentplan.pk %}">
+            <a href="{% url 'pay.plan.header.update' paymentplanheader.pk %}">
               <i class="fa fa-edit"></i>
             {% else %}
-            <a href="{% url 'pay.plan.detail' paymentplan.pk %}">
+            <a href="{% url 'pay.plan.header.detail' paymentplanheader.pk %}">
             {% endif %}
-              {{ paymentplan.slug }}
+              {{ paymentplanheader.slug }}
             </a>
-            {{ paymentplan.name }}
+            {{ paymentplanheader.name }}
             {% if detail %}
-              {% if not paymentplan.intervals|length %}
+              {% if not paymentplanheader.intervals|length %}
                 <br />
-                <a href="{% url 'pay.plan.delete' paymentplan.pk %}">
+                <a href="{% url 'pay.plan.header.delete' paymentplanheader.pk %}">
                   <i class="fa fa-trash-o"></i>
                   <small>Delete payment plan...</small>
                 </a>
@@ -57,7 +57,7 @@
         </tr>
       </tbody>
       <tbody>
-        {% for interval in paymentplan.intervals %}
+        {% for interval in paymentplanheader.intervals %}
           <tr valign="top">
             <td>
               {{ interval.days_after }}
@@ -83,7 +83,7 @@
         {% if detail %}
           <tr valign="top">
             <td>
-              <a href="{% url 'pay.plan.interval.create' paymentplan.pk %}">
+              <a href="{% url 'pay.plan.interval.create' paymentplanheader.pk %}">
                 <i class="fa fa-plus"></i>
                 <small>Add installment...</small>
               </a>
