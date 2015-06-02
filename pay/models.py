@@ -491,12 +491,12 @@ class PaymentPlan(TimeStampedModel):
         verbose_name_plural = 'Payment plan run'
 
     def __str__(self):
-        return '{}'.format(self.slug)
+        return '{}'.format(self.payment_plan_header.slug)
 
 reversion.register(PaymentPlan)
 
 
-class PaymentPlanItem(models.Model):
+class PaymentPlanAudit(models.Model):
     """Record of payments received from an object (client).
 
     We want to make 100% sure that an object (client) only ever pays an
@@ -513,10 +513,10 @@ class PaymentPlanItem(models.Model):
             'payment_plan',
             'payment_interval',
         )
-        verbose_name = 'Payment plan item'
-        verbose_name_plural = 'Payment plan item'
+        verbose_name = 'Payment plan audit'
+        verbose_name_plural = 'Payment plan audit'
 
     def __str__(self):
         return '{}, {}'.format(self.contact.full_name, self.template.slug)
 
-reversion.register(PaymentPlanItem)
+reversion.register(PaymentPlanAudit)

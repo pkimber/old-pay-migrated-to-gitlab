@@ -7,6 +7,8 @@ from finance.models import VatSettings
 from pay.models import (
     Payment,
     PaymentLine,
+    PaymentPlan,
+    PaymentPlanAudit,
     PaymentPlanHeader,
     PaymentPlanInterval,
 )
@@ -57,6 +59,16 @@ class PaymentLineFactory(factory.django.DjangoModelFactory):
         return n
 
 
+class PaymentPlanAuditFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = PaymentPlanAudit
+
+    @factory.sequence
+    def name(n):
+        return 'audit_{:02d}'.format(n)
+
+
 class PaymentPlanHeaderFactory(factory.django.DjangoModelFactory):
 
     class Meta:
@@ -64,7 +76,7 @@ class PaymentPlanHeaderFactory(factory.django.DjangoModelFactory):
 
     @factory.sequence
     def name(n):
-        return 'plan_{:02d}'.format(n)
+        return 'header_{:02d}'.format(n)
 
 
 class PaymentPlanIntervalFactory(factory.django.DjangoModelFactory):
@@ -76,3 +88,11 @@ class PaymentPlanIntervalFactory(factory.django.DjangoModelFactory):
     #category = factory.SubFactory(ProductCategoryFactory)
     payment_plan_header = factory.SubFactory(PaymentPlanHeaderFactory)
     value = Decimal('99')
+
+
+class PaymentPlanFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = PaymentPlan
+
+    payment_plan_header = factory.SubFactory(PaymentPlanHeaderFactory)

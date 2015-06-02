@@ -15,21 +15,31 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentPlan',
             fields=[
-                ('id', models.AutoField(auto_created=True, serialize=False, primary_key=True, verbose_name='ID')),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('object_id', models.PositiveIntegerField()),
                 ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
             ],
             options={
-                'verbose_name_plural': 'Payment plan run',
                 'verbose_name': 'Payment plan run',
+                'verbose_name_plural': 'Payment plan run',
+            },
+        ),
+        migrations.CreateModel(
+            name='PaymentPlanAudit',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
+            ],
+            options={
+                'verbose_name': 'Payment plan audit',
+                'verbose_name_plural': 'Payment plan audit',
             },
         ),
         migrations.CreateModel(
             name='PaymentPlanHeader',
             fields=[
-                ('id', models.AutoField(auto_created=True, serialize=False, primary_key=True, verbose_name='ID')),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('name', models.TextField()),
@@ -37,15 +47,15 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(default=False)),
             ],
             options={
-                'verbose_name_plural': 'Payment plan headers',
-                'verbose_name': 'Payment plan header',
                 'ordering': ('slug',),
+                'verbose_name': 'Payment plan header',
+                'verbose_name_plural': 'Payment plan headers',
             },
         ),
         migrations.CreateModel(
             name='PaymentPlanInterval',
             fields=[
-                ('id', models.AutoField(auto_created=True, serialize=False, primary_key=True, verbose_name='ID')),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('days_after', models.PositiveIntegerField()),
@@ -54,22 +64,20 @@ class Migration(migrations.Migration):
                 ('payment_plan_header', models.ForeignKey(to='pay.PaymentPlanHeader')),
             ],
             options={
-                'verbose_name_plural': 'Payment plan intervals',
-                'verbose_name': 'Payment plan interval',
                 'ordering': ('payment_plan_header__slug', 'days_after'),
+                'verbose_name': 'Payment plan interval',
+                'verbose_name_plural': 'Payment plan intervals',
             },
         ),
-        migrations.CreateModel(
-            name='PaymentPlanItem',
-            fields=[
-                ('id', models.AutoField(auto_created=True, serialize=False, primary_key=True, verbose_name='ID')),
-                ('payment_interval', models.ForeignKey(to='pay.PaymentPlanInterval')),
-                ('payment_plan', models.ForeignKey(to='pay.PaymentPlan')),
-            ],
-            options={
-                'verbose_name_plural': 'Payment plan item',
-                'verbose_name': 'Payment plan item',
-            },
+        migrations.AddField(
+            model_name='paymentplanaudit',
+            name='payment_interval',
+            field=models.ForeignKey(to='pay.PaymentPlanInterval'),
+        ),
+        migrations.AddField(
+            model_name='paymentplanaudit',
+            name='payment_plan',
+            field=models.ForeignKey(to='pay.PaymentPlan'),
         ),
         migrations.AddField(
             model_name='paymentplan',
@@ -77,7 +85,7 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(to='pay.PaymentPlanHeader'),
         ),
         migrations.AlterUniqueTogether(
-            name='paymentplanitem',
+            name='paymentplanaudit',
             unique_together=set([('payment_plan', 'payment_interval')]),
         ),
         migrations.AlterUniqueTogether(
