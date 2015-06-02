@@ -8,8 +8,10 @@ from .views import (
     PaymentAuditListView,
     PaymentListView,
     PaymentPlanCreateView,
+    PaymentPlanDeleteView,
     PaymentPlanDetailView,
     PaymentPlanIntervalCreateView,
+    PaymentPlanIntervalDeleteView,
     PaymentPlanIntervalUpdateView,
     PaymentPlanListView,
     PaymentPlanUpdateView,
@@ -38,6 +40,10 @@ urlpatterns = patterns(
         view=PaymentPlanDetailView.as_view(),
         name='pay.plan.detail'
         ),
+    url(regex=r'^plan/(?P<pk>\d+)/delete/$',
+        view=PaymentPlanDeleteView.as_view(),
+        name='pay.plan.delete'
+        ),
     url(regex=r'^plan/(?P<pk>\d+)/update/$',
         view=PaymentPlanUpdateView.as_view(),
         name='pay.plan.update'
@@ -45,6 +51,10 @@ urlpatterns = patterns(
     url(regex=r'^plan/(?P<pk>\d+)/interval/create/$',
         view=PaymentPlanIntervalCreateView.as_view(),
         name='pay.plan.interval.create'
+        ),
+    url(regex=r'^plan/interval/(?P<pk>\d+)/delete/$',
+        view=PaymentPlanIntervalDeleteView.as_view(),
+        name='pay.plan.interval.delete'
         ),
     url(regex=r'^plan/interval/(?P<pk>\d+)/update/$',
         view=PaymentPlanIntervalUpdateView.as_view(),

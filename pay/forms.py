@@ -15,6 +15,13 @@ class PayLaterForm(forms.ModelForm):
         fields = ()
 
 
+class PaymentPlanEmptyForm(forms.ModelForm):
+
+    class Meta:
+        model = PaymentPlan
+        fields = ()
+
+
 class PaymentPlanForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
@@ -29,6 +36,13 @@ class PaymentPlanForm(forms.ModelForm):
             'slug',
             'name',
         )
+
+
+class PaymentPlanIntervalEmptyForm(forms.ModelForm):
+
+    class Meta:
+        model = PaymentPlanInterval
+        fields = ()
 
 
 class PaymentPlanIntervalForm(forms.ModelForm):

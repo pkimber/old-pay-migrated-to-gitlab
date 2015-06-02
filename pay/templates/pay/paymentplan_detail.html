@@ -20,12 +20,30 @@
               Slug
             </td>
             <td>
-              <a href="{% url 'pay.plan.update' object.pk %}">
-                <i class="fa fa-edit"></i>
-                {{ object.slug }}
-              </a>
+              {% if object.deleted %}
+                <strike>
+                  {{ object.slug }}
+                </strike>
+              {% else %}
+                <a href="{% url 'pay.plan.update' object.pk %}">
+                  <i class="fa fa-edit"></i>
+                  {{ object.slug }}
+                </a>
+              {% endif %}
             </td>
           </tr>
+          {% if object.deleted %}
+          <tr valign="top">
+            <td>
+              Status
+            </td>
+            <td>
+              <strong>
+                Deleted
+              </strong>
+            </td>
+          </tr>
+          {% endif %}
           <tr valign="top">
             <td>
               Name

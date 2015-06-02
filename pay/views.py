@@ -4,6 +4,7 @@ import stripe
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -29,7 +30,9 @@ from mail.service import (
 from mail.tasks import process_mail
 
 from .forms import (
+    PaymentPlanEmptyForm,
     PaymentPlanForm,
+    PaymentPlanIntervalEmptyForm,
     PaymentPlanIntervalForm,
     StripeForm,
 )
@@ -153,6 +156,24 @@ class PaymentPlanCreateView(
     model = PaymentPlan
 
 
+class PaymentPlanDeleteView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanEmptyForm
+    model = PaymentPlan
+    template_name = 'pay/paymentplan_delete.html'
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            self.object.deleted = True
+            self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('pay.plan.list')
+
+
 class PaymentPlanDetailView(
         LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, DetailView):
 
@@ -173,6 +194,21 @@ class PaymentPlanIntervalCreateView(
         with transaction.atomic():
             self.object = form.save(commit=False)
             self.object.plan = self._get_payment_plan()
+            self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class PaymentPlanIntervalDeleteView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanIntervalEmptyForm
+    model = PaymentPlanInterval
+    template_name = 'pay/paymentplaninterval_delete.html'
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            self.object.deleted = True
             self.object = form.save()
         return HttpResponseRedirect(self.get_success_url())
 

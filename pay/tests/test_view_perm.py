@@ -17,9 +17,20 @@ class TestViewPerm(PermTestCase):
     def test_pay_create(self):
         self.assert_staff_only(reverse('pay.plan.create'))
 
+    def test_pay_delete(self):
+        plan = PaymentPlanFactory()
+        self.assert_staff_only(reverse('pay.plan.delete', args=[plan.pk]))
+
     def test_pay_detail(self):
         plan = PaymentPlanFactory()
         self.assert_staff_only(reverse('pay.plan.detail', args=[plan.pk]))
+
+    def test_pay_list(self):
+        self.assert_staff_only(reverse('pay.plan.list'))
+
+    def test_pay_update(self):
+        plan = PaymentPlanFactory()
+        self.assert_staff_only(reverse('pay.plan.update', args=[plan.pk]))
 
     def test_pay_interval_create(self):
         plan = PaymentPlanFactory()
@@ -33,9 +44,8 @@ class TestViewPerm(PermTestCase):
             reverse('pay.plan.interval.update', args=[interval.pk])
         )
 
-    def test_pay_list(self):
-        self.assert_staff_only(reverse('pay.plan.list'))
-
-    def test_pay_update(self):
-        plan = PaymentPlanFactory()
-        self.assert_staff_only(reverse('pay.plan.update', args=[plan.pk]))
+    def test_pay_interval_delete(self):
+        interval = PaymentPlanIntervalFactory()
+        self.assert_staff_only(
+            reverse('pay.plan.interval.delete', args=[interval.pk])
+        )
