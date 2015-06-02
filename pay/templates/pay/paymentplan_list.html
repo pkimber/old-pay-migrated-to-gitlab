@@ -11,6 +11,13 @@
 
 {% block content %}
   {% include 'pay/_pay_menu.html' %}
+  {% if is_paginated %}
+    <div class="pure-g">
+      <div class="pure-u-1">
+        {% include 'base/_paginate.html' %}
+      </div>
+    </div>
+  {% endif %}
   <div class="pure-g">
     {% for paymentplan in paymentplan_list %}
       {% include 'pay/_paymentplan.html' %}

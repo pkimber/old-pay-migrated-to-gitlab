@@ -229,6 +229,8 @@ class PaymentPlanListView(
         LoginRequiredMixin, StaffuserRequiredMixin,
         BaseMixin, ListView):
 
+    paginate_by = 5
+
     def get_queryset(self):
         return PaymentPlan.objects.current()
 
