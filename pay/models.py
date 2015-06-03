@@ -392,16 +392,11 @@ class PaymentPlanHeaderManager(models.Manager):
 
 
 class PaymentPlanHeader(TimeStampedModel):
-    """Header record for a payment plan."""
+    """Header record for the definition of a payment plan."""
 
     name = models.TextField()
     slug = models.SlugField(unique=True)
     deleted = models.BooleanField(default=False)
-    #category = models.ForeignKey(ProductCategory)
-    #payment = models.ForeignKey(
-    #    Payment,
-    #    help_text='The plan is initiated with a payment'
-    #)
     objects = PaymentPlanHeaderManager()
 
     class Meta:
@@ -421,20 +416,13 @@ class PaymentPlanHeader(TimeStampedModel):
 reversion.register(PaymentPlanHeader)
 
 
-#class PaymentPlanIntervalManager(models.Manager):
-#
-#    def current(self):
-#        """List of intervals excluding 'deleted'."""
-#        return self.model.objects.exclude(deleted=True)
-
-
 class PaymentPlanInterval(TimeStampedModel):
+    """The payment intervals for the payment plan header record."""
 
     payment_plan_header = models.ForeignKey(PaymentPlanHeader)
     days_after = models.PositiveIntegerField()
     value = models.DecimalField(max_digits=8, decimal_places=2)
     deleted = models.BooleanField(default=False)
-    #objects = PaymentPlanIntervalManager()
 
     class Meta:
         ordering = ('payment_plan_header__slug', 'days_after')
@@ -472,26 +460,28 @@ reversion.register(StripeCustomer)
 
 
 class PaymentPlan(TimeStampedModel):
-    """The actual record which controls the execution of a payment plan."""
+    """Set-up and control the execution of a payment plan."""
+    payment = models.OneToOneField(
+        Payment,
+        help_text='The plan is initiated with a payment',
+        unique=True,
+    )
     payment_plan_header = models.ForeignKey(PaymentPlanHeader)
-    # link to the object in the system which requested the payment plan
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
-    #objects = PaymentPlanRunnerManager()
 
     class Meta:
         # TODO Check the unique index on the 'content_object'.  Is it correct?
         unique_together = (
+            'payment',
             'payment_plan_header',
-            'content_type',
-            'object_id',
         )
-        verbose_name = 'Payment plan run'
-        verbose_name_plural = 'Payment plan run'
+        verbose_name = 'Payment plan'
+        verbose_name_plural = 'Payment plans'
 
     def __str__(self):
-        return '{}'.format(self.payment_plan_header.slug)
+        return '{} for {}'.format(
+            self.payment_plan_header.slug,
+            self.payment.name,
+        )
 
 reversion.register(PaymentPlan)
 

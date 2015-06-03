@@ -7,7 +7,6 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
         ('pay', '0006_auto_20150528_2201'),
     ]
 
@@ -15,31 +14,30 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentPlan',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
-                ('object_id', models.PositiveIntegerField()),
-                ('content_type', models.ForeignKey(to='contenttypes.ContentType')),
+                ('payment', models.OneToOneField(help_text='The plan is initiated with a payment', to='pay.Payment')),
             ],
             options={
-                'verbose_name': 'Payment plan run',
-                'verbose_name_plural': 'Payment plan run',
+                'verbose_name_plural': 'Payment plans',
+                'verbose_name': 'Payment plan',
             },
         ),
         migrations.CreateModel(
             name='PaymentPlanAudit',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
             ],
             options={
-                'verbose_name': 'Payment plan audit',
                 'verbose_name_plural': 'Payment plan audit',
+                'verbose_name': 'Payment plan audit',
             },
         ),
         migrations.CreateModel(
             name='PaymentPlanHeader',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('name', models.TextField()),
@@ -47,15 +45,15 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(default=False)),
             ],
             options={
-                'ordering': ('slug',),
-                'verbose_name': 'Payment plan header',
                 'verbose_name_plural': 'Payment plan headers',
+                'verbose_name': 'Payment plan header',
+                'ordering': ('slug',),
             },
         ),
         migrations.CreateModel(
             name='PaymentPlanInterval',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', primary_key=True, serialize=False, auto_created=True)),
+                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('days_after', models.PositiveIntegerField()),
@@ -64,9 +62,9 @@ class Migration(migrations.Migration):
                 ('payment_plan_header', models.ForeignKey(to='pay.PaymentPlanHeader')),
             ],
             options={
-                'ordering': ('payment_plan_header__slug', 'days_after'),
-                'verbose_name': 'Payment plan interval',
                 'verbose_name_plural': 'Payment plan intervals',
+                'verbose_name': 'Payment plan interval',
+                'ordering': ('payment_plan_header__slug', 'days_after'),
             },
         ),
         migrations.AddField(
@@ -90,6 +88,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='paymentplan',
-            unique_together=set([('payment_plan_header', 'content_type', 'object_id')]),
+            unique_together=set([('payment', 'payment_plan_header')]),
         ),
     ]
