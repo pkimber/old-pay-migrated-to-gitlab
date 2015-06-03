@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentPlan',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('payment', models.OneToOneField(help_text='The plan is initiated with a payment', to='pay.Payment')),
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentPlanAudit',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
             ],
             options={
                 'verbose_name_plural': 'Payment plan audit',
@@ -35,9 +35,23 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.CreateModel(
+            name='PaymentPlanAuditStatus',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('modified', models.DateTimeField(auto_now=True)),
+                ('slug', models.SlugField(unique=True)),
+                ('name', models.CharField(max_length=100)),
+            ],
+            options={
+                'verbose_name_plural': 'Payment plans audit status',
+                'verbose_name': 'Payment plan audit status',
+            },
+        ),
+        migrations.CreateModel(
             name='PaymentPlanHeader',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('name', models.TextField()),
@@ -53,7 +67,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PaymentPlanInterval',
             fields=[
-                ('id', models.AutoField(serialize=False, verbose_name='ID', primary_key=True, auto_created=True)),
+                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('modified', models.DateTimeField(auto_now=True)),
                 ('days_after', models.PositiveIntegerField()),
@@ -65,6 +79,20 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'Payment plan intervals',
                 'verbose_name': 'Payment plan interval',
                 'ordering': ('payment_plan_header__slug', 'days_after'),
+            },
+        ),
+        migrations.CreateModel(
+            name='PaymentPlanStatus',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, verbose_name='ID', serialize=False)),
+                ('created', models.DateTimeField(auto_now_add=True)),
+                ('modified', models.DateTimeField(auto_now=True)),
+                ('slug', models.SlugField(unique=True)),
+                ('name', models.CharField(max_length=100)),
+            ],
+            options={
+                'verbose_name_plural': 'Payment plans status',
+                'verbose_name': 'Payment plan status',
             },
         ),
         migrations.AddField(

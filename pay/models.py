@@ -25,6 +25,16 @@ def default_payment_state():
     return PaymentState.objects.get(slug=PaymentState.DUE).pk
 
 
+def default_payment_plan_status():
+    return PaymentPlanStatus.objects.get(slug=PaymentPlanStatus.ACTIVE).pk
+
+
+def default_payment_plan_audit_status():
+    return PaymentPlanAuditStatus.objects.get(
+        slug=PaymentPlanAuditStatus.REQUESTED
+    ).pk
+
+
 class PayError(Exception):
 
     def __init__(self, value):
@@ -459,14 +469,38 @@ class StripeCustomer(TimeStampedModel):
 reversion.register(StripeCustomer)
 
 
+class PaymentPlanStatus(TimeStampedModel):
+
+    ACTIVE = 'active'
+    COMPLETE = 'complete'
+    DELETED = 'deleted'
+
+    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'Payment plan status'
+        verbose_name_plural = 'Payment plans status'
+
+    def __str__(self):
+        return '{} for {}'.format(self.slug, self.name)
+
+reversion.register(PaymentPlanStatus)
+
+
 class PaymentPlan(TimeStampedModel):
     """Set-up and control the execution of a payment plan."""
+
     payment = models.OneToOneField(
         Payment,
         help_text='The plan is initiated with a payment',
         unique=True,
     )
     payment_plan_header = models.ForeignKey(PaymentPlanHeader)
+    status = models.ForeignKey(
+        PaymentPlanStatus,
+        default=default_payment_plan_status,
+    )
 
     class Meta:
         # TODO Check the unique index on the 'content_object'.  Is it correct?
@@ -486,6 +520,25 @@ class PaymentPlan(TimeStampedModel):
 reversion.register(PaymentPlan)
 
 
+class PaymentPlanAuditStatus(TimeStampedModel):
+
+    #PENDING = 'pending' I don't think I need this one.
+    REQUESTED = 'requested'
+    RECEIVED = 'received'
+
+    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=100)
+
+    class Meta:
+        verbose_name = 'Payment plan audit status'
+        verbose_name_plural = 'Payment plans audit status'
+
+    def __str__(self):
+        return '{} for {}'.format(self.slug, self.name)
+
+reversion.register(PaymentPlanAuditStatus)
+
+
 class PaymentPlanAudit(models.Model):
     """Record of payments received from an object (client).
 
@@ -497,6 +550,10 @@ class PaymentPlanAudit(models.Model):
 
     payment_plan = models.ForeignKey(PaymentPlan)
     payment_interval = models.ForeignKey(PaymentPlanInterval)
+    status = models.ForeignKey(
+        PaymentPlanAuditStatus,
+        default=default_payment_plan_audit_status,
+    )
 
     class Meta:
         unique_together = (
