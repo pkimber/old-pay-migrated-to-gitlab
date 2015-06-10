@@ -12,6 +12,7 @@ gitpython
 hgapi
 ipdb
 psycopg2
+pytest-cov
 pytest-django
 pytest-flakes
 pytest-pep8

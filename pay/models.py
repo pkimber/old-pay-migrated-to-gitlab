@@ -427,7 +427,12 @@ reversion.register(PaymentPlanHeader)
 
 
 class PaymentPlanInterval(TimeStampedModel):
-    """The payment intervals for the payment plan header record."""
+    """The payment intervals for the payment plan header record.
+
+    TODO Do I need a *final* interval type which just takes the remaining
+    money?
+
+    """
 
     payment_plan_header = models.ForeignKey(PaymentPlanHeader)
     days_after = models.PositiveIntegerField()
