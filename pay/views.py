@@ -4,9 +4,17 @@ import stripe
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
+from django.views.generic import ListView
 
+from braces.views import (
+    LoginRequiredMixin,
+    StaffuserRequiredMixin,
+)
+
+from base.view_utils import BaseMixin
 from mail.models import Notify
 from mail.service import (
     queue_mail_message,
@@ -84,16 +92,46 @@ def _send_notification_email(payment, request):
 def pay_later_view(request, pk):
     payment = Payment.objects.get(pk=pk)
     _check_perm(request, payment)
-    payment.check_can_pay()
+    payment.check_can_pay
     payment.set_pay_later()
     queue_mail_template(
         payment,
-        PAYMENT_LATER,
+        payment.mail_template_name,
         payment.mail_template_context(),
     )
     _send_notification_email(payment, request)
     process_mail.delay()
     return HttpResponseRedirect(payment.url)
+
+
+class PaymentAuditListView(
+        LoginRequiredMixin, StaffuserRequiredMixin,
+        BaseMixin, ListView):
+
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(dict(audit=True))
+        return context
+
+    def get_queryset(self):
+        return Payment.objects.payments_audit()
+
+
+class PaymentListView(
+        LoginRequiredMixin, StaffuserRequiredMixin,
+        BaseMixin, ListView):
+
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(dict(audit=False))
+        return context
+
+    def get_queryset(self):
+        return Payment.objects.payments()
 
 
 class StripeFormViewMixin(object):
@@ -170,7 +208,7 @@ class StripeFormViewMixin(object):
     def get_context_data(self, **kwargs):
         context = super(StripeFormViewMixin, self).get_context_data(**kwargs)
         _check_perm(self.request, self.object)
-        self.object.check_can_pay()
+        self.object.check_can_pay
         context.update(dict(
             currency=CURRENCY,
             description=self.object.description,
@@ -197,13 +235,14 @@ class StripeFormViewMixin(object):
                 amount=self.object.total_as_pennies(), # amount in pennies, again
                 currency=CURRENCY,
                 customer=customer_id,
-                description=self.object.description,
+                description=', '.join(self.object.description),
             )
-            self.object.set_paid()
+            with transaction.atomic():
+                self.object.set_paid()
             queue_mail_template(
                 self.object,
-                PAYMENT_THANKYOU,
-                self.object.mail_template_context()
+                self.object.mail_template_name,
+                self.object.mail_template_context(),
             )
             _send_notification_email(self.object, self.request)
             process_mail.delay()

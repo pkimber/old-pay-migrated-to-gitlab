@@ -27,7 +27,7 @@ setup(
             'templates/pay/*.*',
         ],
     },
-    version='0.1.24',
+    version='0.1.28',
     description='pay',
     author='Malcolm Dinsmore',
     author_email='m.dinsmore@talk21.com',

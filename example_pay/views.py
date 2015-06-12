@@ -1,23 +1,17 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.views.generic import (
-    DetailView,
     ListView,
     UpdateView,
 )
 
 from base.view_utils import BaseMixin
-
-from pay.models import Payment
 from pay.views import (
     PAYMENT_PK,
     StripeFormViewMixin,
 )
-
 from .forms import ExampleCheckoutForm
 from .models import SalesLedger
 
@@ -30,18 +24,14 @@ class ExampleCheckout(UpdateView):
 
     model = SalesLedger
     form_class = ExampleCheckoutForm
+    template_name = 'example/salesledger_form.html'
 
     def form_valid(self, form):
         with transaction.atomic():
             super(ExampleCheckout, self).form_valid(form)
             payment = self.object.create_payment()
-            payment.save()
-            payment.url = reverse(
-                'example.payment', kwargs=dict(pk=payment.pk)
-            )
-            payment.url_failure = reverse(
-                'example.payment', kwargs=dict(pk=payment.pk)
-            )
+            payment.url = reverse('pay.list')
+            payment.url_failure = reverse('pay.list')
             payment.save()
             self.request.session[PAYMENT_PK] = payment.pk
             return HttpResponseRedirect(
@@ -53,10 +43,10 @@ class ExampleCheckout(UpdateView):
         return reverse('project.home')
 
 
-class ExamplePaymentDetailView(DetailView):
-
-    template_name = 'example_pay/payment_detail.html'
-    model = Payment
+#class ExamplePaymentDetailView(DetailView):
+#
+#    template_name = 'example_pay/payment_detail.html'
+#    model = Payment
 
 
 class HomeView(ListView):

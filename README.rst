@@ -51,15 +51,9 @@ Add the following to your ``.private`` file::
 
 ::
 
-  py.test -x && \
-      touch temp.db && rm temp.db && \
-      django-admin.py migrate --noinput && \
-      django-admin.py demo_data_login && \
-      django-admin.py init_app_pay && \
-      django-admin.py demo_data_pay && \
-      django-admin.py runserver
+  ../init_dev.sh
 
 Release
 =======
 
-https://django-dev-and-deploy-using-salt.readthedocs.org/
+https://www.pkimber.net/open/

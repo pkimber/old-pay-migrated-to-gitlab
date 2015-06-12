@@ -1,6 +1,4 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
@@ -13,7 +11,6 @@ from pay.views import pay_later_view
 
 from .views import (
     ExampleCheckout,
-    ExamplePaymentDetailView,
     HomeView,
     StripeUpdateView,
 )
@@ -27,11 +24,18 @@ urlpatterns = patterns(
         view=HomeView.as_view(),
         name='project.home'
         ),
+    url(regex=r'^$',
+        view=HomeView.as_view(),
+        name='project.settings'
+        ),
     url(regex=r'^',
         view=include('login.urls')
         ),
     url(regex=r'^admin/',
         view=include(admin.site.urls)
+        ),
+    url(regex=r'^pay/',
+        view=include('pay.urls')
         ),
     url(r'^home/user/$',
         view=RedirectView.as_view(url=reverse_lazy('project.home')),
@@ -40,10 +44,6 @@ urlpatterns = patterns(
     url(regex=r'^example/checkout/(?P<pk>\d+)/$',
         view=ExampleCheckout.as_view(),
         name='example.checkout'
-        ),
-    url(regex=r'^example/payment/(?P<pk>\d+)/$',
-        view=ExamplePaymentDetailView.as_view(),
-        name='example.payment'
         ),
     url(regex=r'^later/(?P<pk>\d+)/$',
         view=pay_later_view,

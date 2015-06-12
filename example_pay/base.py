@@ -20,14 +20,11 @@ def get_env_variable(key):
 
 
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 TESTING = False
 THUMBNAIL_DEBUG = DEBUG
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
-
-TEMPLATE_STRING_IF_INVALID = '**** INVALID EXPRESSION: %s ****'
 
 ADMINS = (
     ('admin', 'code@pkimber.net'),
@@ -111,11 +108,25 @@ ROOT_URLCONF = 'example_pay.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'example_pay.wsgi.application'
 
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages',
+            ],
+            'string_if_invalid': '**** INVALID EXPRESSION: %s ****',
+        },
+    },
+]
 
 DJANGO_APPS = (
     'django.contrib.auth',
@@ -137,6 +148,7 @@ THIRD_PARTY_APPS = (
 LOCAL_APPS = (
     'base',
     'example_pay',
+    'finance',
     'login',
     'mail',
     'pay',
@@ -188,6 +200,14 @@ LOGGING = {
 CAPTCHA_LETTER_ROTATION = None
 CAPTCHA_NOISE_FUNCTIONS = None
 CAPTCHA_TEST_MODE = True
+
+# Celery
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+# https://kfalck.net/2013/02/21/run-multiple-celeries-on-a-single-redis
+CELERY_DEFAULT_QUEUE = 'pay'
+# http://celery.readthedocs.org/en/latest/userguide/tasks.html#disable-rate-limits-if-they-re-not-used
+CELERY_DISABLE_RATE_LIMITS = True
 
 # django-compressor
 COMPRESS_ENABLED = False # defaults to the opposite of DEBUG
