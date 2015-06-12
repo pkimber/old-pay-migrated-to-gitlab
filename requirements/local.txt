@@ -7,6 +7,7 @@
 -e ../stock
 beautifulsoup4
 devpi-client
+django_extensions
 factory-boy
 gitpython
 hgapi
@@ -17,3 +18,4 @@ pytest-flakes
 pytest-pep8
 pyyaml
 walkdir
+django-debug-toolbar
