@@ -20,17 +20,18 @@ def get_readme():
 
 setup(
     name='kb-pay',
-    packages=['pay', 'pay.management', 'pay.management.commands', 'pay.migrations', 'pay.tests'],
+    packages=['pay', 'pay.migrations', 'pay.tests', 'pay.management', 'pay.management.commands'],
     package_data={
         'pay': [
+            'static/*.*',
             'templates/*.*',
             'templates/pay/*.*',
         ],
     },
-    version='0.1.28',
+    version='0.1.29',
     description='pay',
-    author='Malcolm Dinsmore',
-    author_email='m.dinsmore@talk21.com',
+    author='Patrick Kimber',
+    author_email='code@pkimber.net',
     url='git@github.com:pkimber/pay.git',
     classifiers=[
         'Development Status :: 1 - Planning',
