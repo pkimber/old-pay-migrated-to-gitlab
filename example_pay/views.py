@@ -52,12 +52,12 @@ class ExampleCheckout(UpdateView):
 class HomeView(ListView):
 
     model = SalesLedger
-    template_name = 'example_pay/home.html'
+    template_name = 'example/home.html'
 
 
 class StripeUpdateView(StripeFormViewMixin, BaseMixin, UpdateView):
 
-    template_name = 'example_pay/stripe.html'
+    template_name = 'example/stripe.html'
 
     def get_success_url(self):
         return reverse('project.home')
