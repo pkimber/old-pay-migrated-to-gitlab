@@ -9,11 +9,59 @@ from pay.models import (
     Payment,
     PaymentLine,
     PaymentState,
+    PaymentType,
 )
 from pay.service import (
+    PAYMENT_CARD_REFRESH,
     PAYMENT_LATER,
     PAYMENT_THANKYOU,
 )
+
+
+class ExampleCardRefresh(models.Model):
+
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    payment_state = models.ForeignKey(
+        PaymentState,
+        default=default_payment_state,
+    )
+
+    class Meta:
+        ordering = ('pk',)
+        verbose_name = 'Example Card Refresh'
+        verbose_name_plural = 'Example Card Refresh'
+
+    def __str__(self):
+        return '{}'.format(self.email)
+
+    def allow_pay_later(self):
+        return False
+
+    def create_payment(self):
+        """Example card refresh (payment type 'card_refresh')
+
+        Note: Must be called from within a transaction.
+
+        """
+        return Payment.objects.create_payment(
+            PaymentType.objects.refresh_card,
+            self.name,
+            self.email,
+            self
+        )
+
+    def get_absolute_url(self):
+        """just for testing."""
+        return reverse('project.home')
+
+    @property
+    def mail_template_name(self):
+        return PAYMENT_CARD_REFRESH
+
+    def set_payment_state(self, payment_state):
+        self.payment_state = payment_state
+        self.save()
 
 
 class SalesLedgerManager(models.Manager):
@@ -63,7 +111,12 @@ class SalesLedger(models.Model):
         Note: Must be called from within a transaction.
 
         """
-        payment = Payment.objects.create_payment(self.title, self.email, self)
+        payment = Payment.objects.create_payment(
+            PaymentType.objects.payment,
+            self.title,
+            self.email,
+            self
+        )
         vat_settings = VatSettings.objects.settings()
         PaymentLine.objects.create_payment_line(
             payment=payment,

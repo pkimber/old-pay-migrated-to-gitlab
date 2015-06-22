@@ -5,6 +5,7 @@ from mail.models import MailTemplate
 
 
 # slug for the email template
+PAYMENT_CARD_REFRESH = 'payment_card_refresh'
 PAYMENT_LATER = 'payment_later'
 PAYMENT_THANKYOU = 'payment_thankyou'
 

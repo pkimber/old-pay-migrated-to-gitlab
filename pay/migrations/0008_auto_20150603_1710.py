@@ -14,10 +14,12 @@ def _init_state(model, slug, name):
 
 
 def default_state(apps, schema_editor):
+    # plan
     state = apps.get_model('pay', 'PaymentPlanStatus')
     _init_state(state, 'active', 'Active')
     _init_state(state, 'complete', 'Complete')
     _init_state(state, 'deleted', 'Deleted')
+    # audit
     state = apps.get_model('pay', 'PaymentPlanAuditStatus')
     _init_state(state, 'received', 'Received')
     _init_state(state, 'requested', 'Requested')

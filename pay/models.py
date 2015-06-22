@@ -35,6 +35,10 @@ def default_payment_plan_audit_status():
     ).pk
 
 
+def default_payment_type():
+    return PaymentType.objects.get(slug=PaymentType.PAYMENT).pk
+
+
 class PayError(Exception):
 
     def __init__(self, value):
@@ -47,15 +51,19 @@ class PayError(Exception):
 
 class PaymentStateManager(models.Manager):
 
+    @property
     def due(self):
         return self.model.objects.get(slug=self.model.DUE)
 
+    @property
     def fail(self):
         return self.model.objects.get(slug=self.model.FAIL)
 
+    @property
     def later(self):
         return self.model.objects.get(slug=self.model.LATER)
 
+    @property
     def paid(self):
         return self.model.objects.get(slug=self.model.PAID)
 
@@ -82,15 +90,56 @@ class PaymentState(TimeStampedModel):
 reversion.register(PaymentState)
 
 
+class PaymentTypeManager(models.Manager):
+
+    @property
+    def payment(self):
+        return self.model.objects.get(slug=self.model.PAYMENT)
+
+    @property
+    def payment_plan(self):
+        return self.model.objects.get(slug=self.model.PAYMENT_PLAN)
+
+    @property
+    def refresh_card(self):
+        return self.model.objects.get(slug=self.model.REFRESH_CARD)
+
+
+class PaymentType(TimeStampedModel):
+
+    PAYMENT = 'payment'
+    PAYMENT_PLAN = 'payment-plan'
+    REFRESH_CARD = 'refresh-card'
+
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    amount = models.BooleanField(
+        help_text="Display 'amount' when collecting payment"
+    )
+    objects = PaymentTypeManager()
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Payment type'
+        verbose_name_plural = 'Payment type'
+
+    def __str__(self):
+        return '{}'.format(self.name)
+
+reversion.register(PaymentType)
+
+
 class PaymentManager(models.Manager):
 
-    def create_payment(self, name, email, content_object):
+    def create_payment(self, payment_type, name, email, content_object):
         """Create a payment.
 
         - 'name' is the name of the customer.
 
         """
+
         obj = self.model(
+            payment_type=payment_type,
             content_object=content_object,
             email=email,
             name=name,
@@ -119,6 +168,7 @@ class Payment(TimeStampedModel):
 
     name = models.TextField()
     email = models.EmailField()
+    payment_type = models.ForeignKey(PaymentType, default=default_payment_type)
     state = models.ForeignKey(PaymentState, default=default_payment_state)
     url = models.CharField(
         max_length=100,
@@ -326,6 +376,7 @@ class PaymentLine(TimeStampedModel):
     Line total can be calculated by adding the net and vat amounts
 
     """
+
     payment = models.ForeignKey(Payment)
     line_number = models.IntegerField()
     product = models.ForeignKey(Product)
