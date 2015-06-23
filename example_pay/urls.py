@@ -7,7 +7,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.core.urlresolvers import reverse_lazy
 from django.views.generic import RedirectView
 
-from pay.views import pay_later_view
+#from pay.views import pay_later_view
 
 from .views import (
     ExampleCheckout,
@@ -45,10 +45,10 @@ urlpatterns = patterns(
         view=ExampleCheckout.as_view(),
         name='example.checkout'
         ),
-    url(regex=r'^later/(?P<pk>\d+)/$',
-        view=pay_later_view,
-        name='example.pay.later'
-        ),
+    #url(regex=r'^later/(?P<pk>\d+)/$',
+    #    view=pay_later_view,
+    #    name='example.pay.later'
+    #    ),
     url(regex=r'^stripe/(?P<pk>\d+)/$',
         view=StripeUpdateView.as_view(),
         name='example.pay.stripe'

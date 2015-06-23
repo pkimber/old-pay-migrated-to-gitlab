@@ -10,13 +10,13 @@ from django.views.generic import (
 from base.view_utils import BaseMixin
 from pay.views import (
     PAYMENT_PK,
-    StripeFormViewMixin,
+    StripeMixin,
 )
 from .forms import ExampleCheckoutForm
 from .models import SalesLedger
 
 
-class ExampleCheckout(UpdateView):
+class ExampleCheckout(StripeMixin, BaseMixin, UpdateView):
     """When the user does an HTTP POST to this view, create and attach a
     payment record to the sales ledger item so it can be paid.
 
@@ -55,8 +55,10 @@ class HomeView(ListView):
     template_name = 'example_pay/home.html'
 
 
-class StripeUpdateView(StripeFormViewMixin, BaseMixin, UpdateView):
+class StripeUpdateView(StripeMixin, BaseMixin, UpdateView):
 
+    model = SalesLedger
+    form_class = ExampleCheckoutForm
     template_name = 'example_pay/stripe.html'
 
     def get_success_url(self):

@@ -1,20 +1,20 @@
 # -*- encoding: utf-8 -*-
 from django import forms
 
-from .models import Payment
+from .models import Checkout
 
 
-class PayLaterForm(forms.ModelForm):
+#class PayLaterForm(forms.ModelForm):
+#
+#    class Meta:
+#        model = Payment
+#        fields = ()
 
-    class Meta:
-        model = Payment
-        fields = ()
 
-
-class StripeForm(forms.ModelForm):
+class CheckoutForm(forms.ModelForm):
 
     stripeToken = forms.CharField()
 
     class Meta:
-        model = Payment
+        model = Checkout
         fields = ()

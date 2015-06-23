@@ -2,11 +2,13 @@
 import logging
 import stripe
 
+from decimal import Decimal
+
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
-from django.views.decorators.http import require_POST
+#from django.views.decorators.http import require_POST
 from django.views.generic import ListView
 
 from braces.views import (
@@ -22,15 +24,16 @@ from mail.service import (
 )
 from mail.tasks import process_mail
 
-from .forms import StripeForm
+from .forms import CheckoutForm
 from .models import (
-    Payment,
-    StripeCustomer,
+    Checkout,
+    Customer,
+    log_stripe_error,
 )
-from .service import (
-    PAYMENT_LATER,
-    PAYMENT_THANKYOU,
-)
+#from .service import (
+#    PAYMENT_LATER,
+#    PAYMENT_THANKYOU,
+#)
 
 
 CURRENCY = 'GBP'
@@ -88,20 +91,20 @@ def _send_notification_email(payment, request):
         )
 
 
-@require_POST
-def pay_later_view(request, pk):
-    payment = Payment.objects.get(pk=pk)
-    _check_perm(request, payment)
-    payment.check_can_pay
-    payment.set_pay_later()
-    queue_mail_template(
-        payment,
-        payment.mail_template_name,
-        payment.mail_template_context(),
-    )
-    _send_notification_email(payment, request)
-    process_mail.delay()
-    return HttpResponseRedirect(payment.url)
+#@require_POST
+#def pay_later_view(request, pk):
+#    payment = Payment.objects.get(pk=pk)
+#    _check_perm(request, payment)
+#    payment.check_can_pay
+#    payment.set_pay_later()
+#    queue_mail_template(
+#        payment,
+#        payment.mail_template_name,
+#        payment.mail_template_context(),
+#    )
+#    _send_notification_email(payment, request)
+#    process_mail.delay()
+#    return HttpResponseRedirect(payment.url)
 
 
 class PaymentAuditListView(
@@ -116,7 +119,7 @@ class PaymentAuditListView(
         return context
 
     def get_queryset(self):
-        return Payment.objects.payments_audit()
+        return Checkout.objects.audit()
 
 
 class PaymentListView(
@@ -131,16 +134,18 @@ class PaymentListView(
         return context
 
     def get_queryset(self):
-        return Payment.objects.payments()
+        return Checkout.objects.payments()
 
 
-class StripeFormViewMixin(object):
+class StripeMixin(object):
 
-    form_class = StripeForm
-    model = Payment
+    #form_class = CheckoutForm
+    #model = Checkout
 
-    def _init_stripe_customer(self, name, email, token):
+    def _init_customer(self, name, email, token):
         """Make sure a stripe customer is created and update card (token)."""
+
+        ### The following is the original code
         result = None
         try:
             c = StripeCustomer.objects.get(email=email)
@@ -172,67 +177,35 @@ class StripeFormViewMixin(object):
             )
         )
 
-    def _log_stripe_error(self, e, message):
-        logger.error(
-            'StripeError\n'
-            '{}\n'
-            'http body: {}\n'
-            'http status: {}'.format(
-                message,
-                e.http_body,
-                e.http_status,
-            )
-        )
-
-    def _stripe_customer_create(self, name, email, token):
-        """Use the Stripe API to create/update a customer."""
-        try:
-            return stripe.Customer.create(
-                card=token,
-                description=name,
-                email=email,
-            )
-        except stripe.StripeError as e:
-            self._log_stripe_error(e, 'create - email: {}'.format(email))
-
-    def _stripe_customer_update(self, customer_id, name, token):
-        """Use the Stripe API to create/update a customer."""
-        try:
-            customer = stripe.Customer.retrieve(customer_id)
-            customer.card = token
-            customer.description = name
-            customer.save()
-        except stripe.StripeError as e:
-            self._log_stripe_error(e, 'update - id: {}'.format(customer_id))
-
     def get_context_data(self, **kwargs):
-        context = super(StripeFormViewMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         _check_perm(self.request, self.object)
-        self.object.check_can_pay
+        #self.object.check_can_pay
         context.update(dict(
             currency=CURRENCY,
             description=self.object.description,
             email=self.object.email,
             key=settings.STRIPE_PUBLISH_KEY,
             name=settings.STRIPE_CAPTION,
-            total=self.object.total_as_pennies(),
+            total=self.total_as_pennies(),
         ))
         return context
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        # Create the charge on Stripe's servers - this will charge the user's card
+        # Create the charge on Stripe's servers - this will charge the users card
         token = form.cleaned_data['stripeToken']
         self.object.save_token(token)
         # Set your secret key: remember to change this to your live secret key
         # in production.  See your keys here https://manage.stripe.com/account
         stripe.api_key = settings.STRIPE_SECRET_KEY
         try:
-            customer_id = self._init_stripe_customer(
-                self.object.name, self.object.email, token
+            customer_id = self._init_customer(
+                self.object.email,
+                token
             )
             stripe.Charge.create(
-                amount=self.object.total_as_pennies(), # amount in pennies, again
+                amount=self.total_as_pennies(), # amount in pennies, again
                 currency=CURRENCY,
                 customer=customer_id,
                 description=', '.join(self.object.description),
@@ -246,16 +219,19 @@ class StripeFormViewMixin(object):
             )
             _send_notification_email(self.object, self.request)
             process_mail.delay()
-            result = super(StripeFormViewMixin, self).form_valid(form)
+            result = super().form_valid(form)
         except stripe.CardError as e:
             self.object.set_payment_failed()
             self._log_card_error(e, self.object.pk)
             result = HttpResponseRedirect(self.object.url_failure)
         except stripe.StripeError as e:
             self.object.set_payment_failed()
-            self._log_stripe_error(e, 'payment: {}'.format(self.object.pk))
+            log_stripe_error(logger, e, 'payment: {}'.format(self.object.pk))
             result = HttpResponseRedirect(self.object.url_failure)
         return result
 
     def get_success_url(self):
         return self.object.url
+
+    def total_as_pennies(self):
+        return int(self.object.total * Decimal('100'))

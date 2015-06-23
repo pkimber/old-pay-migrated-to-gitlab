@@ -16,19 +16,6 @@
           {% include 'pay/_form_stripe.html' %}
         </form>
       </div>
-      <div class="l-box">
-        <form class="pure-form" action="{% url 'example.pay.later' object.pk %}" method="POST">
-          {% csrf_token %}
-          <fieldset>
-            <legend>
-              To pay by cheque or with a payment plan:
-            </legend>
-            <button type="submit" class="pure-button pure-button-primary">
-              Pay Later
-            </button>
-          </fieldset>
-        </form>
-      </div>
     </div>
   </div>
 {% endblock %}

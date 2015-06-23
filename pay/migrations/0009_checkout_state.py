@@ -8,14 +8,13 @@ import pay.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('pay', '0002_auto_20141114_2237'),
+        ('pay', '0008_auto_20150623_0831'),
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='payment',
+        migrations.AddField(
+            model_name='checkout',
             name='state',
-            field=models.ForeignKey(default=1, to='pay.PaymentState'),
-            preserve_default=True,
+            field=models.ForeignKey(to='pay.CheckoutState', default=pay.models.default_checkout_state),
         ),
     ]
