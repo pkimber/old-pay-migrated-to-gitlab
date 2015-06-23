@@ -10,8 +10,9 @@ from django.views.generic import RedirectView
 from pay.views import pay_later_view
 
 from .views import (
-    ExampleCheckout,
+    CardRefreshCreateView,
     HomeView,
+    SalesLedgerUpdateView,
     StripeUpdateView,
 )
 
@@ -41,9 +42,13 @@ urlpatterns = patterns(
         view=RedirectView.as_view(url=reverse_lazy('project.home')),
         name='project.dash'
         ),
-    url(regex=r'^example/checkout/(?P<pk>\d+)/$',
-        view=ExampleCheckout.as_view(),
-        name='example.checkout'
+    url(regex=r'^example/card/refresh/$',
+        view=CardRefreshCreateView.as_view(),
+        name='example.card.refresh.create'
+        ),
+    url(regex=r'^example/sales/ledger/(?P<pk>\d+)/$',
+        view=SalesLedgerUpdateView.as_view(),
+        name='example.sales.ledger.update'
         ),
     url(regex=r'^later/(?P<pk>\d+)/$',
         view=pay_later_view,

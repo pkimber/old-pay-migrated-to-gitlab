@@ -1,12 +1,20 @@
 # -*- encoding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django import forms
 
-from .models import SalesLedger
+from .models import (
+    CardRefresh,
+    SalesLedger,
+)
 
 
-class ExampleCheckoutForm(forms.ModelForm):
+class CardRefreshForm(forms.ModelForm):
+
+    class Meta:
+        model = CardRefresh
+        fields = ()
+
+
+class SalesLedgerForm(forms.ModelForm):
 
     class Meta:
         model = SalesLedger

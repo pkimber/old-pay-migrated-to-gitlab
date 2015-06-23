@@ -2,16 +2,16 @@
 import factory
 
 from example_pay.models import (
-    ExampleCardRefresh,
+    CardRefresh,
     SalesLedger,
 )
 from stock.tests.factories import ProductFactory
 
 
-class ExampleCardRefreshFactory(factory.django.DjangoModelFactory):
+class CardRefreshFactory(factory.django.DjangoModelFactory):
 
     class Meta:
-        model = ExampleCardRefresh
+        model = CardRefresh
 
     @factory.sequence
     def email(n):

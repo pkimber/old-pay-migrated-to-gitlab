@@ -18,7 +18,7 @@ from pay.service import (
 )
 
 
-class ExampleCardRefresh(models.Model):
+class CardRefresh(models.Model):
 
     name = models.CharField(max_length=100)
     email = models.EmailField()

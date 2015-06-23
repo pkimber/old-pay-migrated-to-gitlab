@@ -20,6 +20,11 @@
             </a>
           </li>
           <li class="pure-menu-item">
+            <a href="{% url 'example.card.refresh.create' %}" class="pure-menu-link">
+              Card Refresh
+            </a>
+          </li>
+          <li class="pure-menu-item">
             <a href="{% url 'pay.list' %}" class="pure-menu-link">
               Payments
             </a>
@@ -47,7 +52,7 @@
               <td><strong>{{ p.payment_state.name }}</strong></td>
               <td>
                 {% if p.can_pay %}
-                  <a href="{% url 'example.checkout' p.pk %}">
+                  <a href="{% url 'example.sales.ledger.update' p.pk %}">
                     Pay
                   </a>
                 {% endif %}
