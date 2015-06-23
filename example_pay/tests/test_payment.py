@@ -134,17 +134,17 @@ def test_manager_payments():
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p2',
-        state=PaymentState.objects.later(),
+        state=PaymentState.objects.later,
         content_object=SalesLedgerFactory()
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p3',
-        state=PaymentState.objects.fail(),
+        state=PaymentState.objects.fail,
         content_object=SalesLedgerFactory()
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p4',
-        state=PaymentState.objects.paid(),
+        state=PaymentState.objects.paid,
         content_object=SalesLedgerFactory()
     ))
     assert ['p4', 'p3'] == [
