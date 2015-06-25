@@ -49,9 +49,9 @@ urlpatterns = patterns(
     #    view=pay_later_view,
     #    name='example.pay.later'
     #    ),
-    url(regex=r'^stripe/(?P<pk>\d+)/$',
+    url(regex=r'^stripe/update/(?P<pk>\d+)/$',
         view=StripeUpdateView.as_view(),
-        name='example.pay.stripe'
+        name='example.stripe.update'
         ),
 )
 

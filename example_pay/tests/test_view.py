@@ -75,6 +75,6 @@ class TestView(TestCase):
     def test_stripe(self):
         self._set_session_payment_pk(self.checkout.pk)
         response = self.client.get(
-            reverse('example.pay.stripe', kwargs=dict(pk=self.checkout.pk))
+            reverse('example.stripe.update', kwargs=dict(pk=self.checkout.pk))
         )
         self.assertEqual(response.status_code, 200)

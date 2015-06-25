@@ -179,12 +179,13 @@ class StripeMixin(object):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        _check_perm(self.request, self.object)
-        #self.object.check_can_pay
+        # TODO PJK Do I need to re-instate this?
+        # _check_perm(self.request, self.object)
+        # self.object.check_can_pay
         context.update(dict(
             currency=CURRENCY,
-            description=self.object.description,
-            email=self.object.email,
+            description=self.object.checkout_description,
+            email=self.object.checkout_email,
             key=settings.STRIPE_PUBLISH_KEY,
             name=settings.STRIPE_CAPTION,
             total=self.total_as_pennies(),
@@ -234,4 +235,4 @@ class StripeMixin(object):
         return self.object.url
 
     def total_as_pennies(self):
-        return int(self.object.total * Decimal('100'))
+        return int(self.object.checkout_total * Decimal('100'))

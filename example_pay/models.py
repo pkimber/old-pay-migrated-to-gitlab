@@ -104,5 +104,13 @@ class SalesLedger(models.Model):
         self.save()
 
     @property
-    def total(self):
+    def checkout_description(self):
+        return [self.description]
+
+    @property
+    def checkout_email(self):
+        return self.email
+
+    @property
+    def checkout_total(self):
         return self.product.price * self.quantity

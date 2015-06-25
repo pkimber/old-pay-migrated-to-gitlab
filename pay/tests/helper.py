@@ -16,9 +16,9 @@ def check_stripe_checkout(model_instance):
     clean_and_save(checkout)
     # can the generic content be paid?
     # required attributes
-    model_instance.description
-    model_instance.email
-    model_instance.total
+    model_instance.checkout_description
+    model_instance.checkout_email
+    model_instance.checkout_total
     model_instance.checkout_state
     model_instance.set_checkout_state(CheckoutState.objects.success)
     # do we have mail templates for paid and pay later?
