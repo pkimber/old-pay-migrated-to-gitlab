@@ -1,0 +1,19 @@
+{% extends "pay/base.html" %}
+
+{% block sub_title %}
+  Example Card Refresh
+{% endblock sub_title %}
+
+{% block sub_heading %}
+  Example Card Refresh
+{% endblock sub_heading %}
+
+{% block content %}
+  <div class="pure-g">
+    <div class="pure-u-1">
+      <div class="l-box">
+        {% include '_form.html' with legend='Refresh your card details' submit='Refresh' %}
+      </div>
+    </div>
+  </div>
+{% endblock content %}

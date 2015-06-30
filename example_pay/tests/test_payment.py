@@ -101,22 +101,22 @@ def test_manager_payments_audit():
     VatSettingsFactory()
     PaymentLineFactory(payment=PaymentFactory(
         name='p1',
-        state=PaymentState.objects.due(),
+        state=PaymentState.objects.due,
         content_object=SalesLedgerFactory()
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p2',
-        state=PaymentState.objects.later(),
+        state=PaymentState.objects.later,
         content_object=SalesLedgerFactory()
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p3',
-        state=PaymentState.objects.fail(),
+        state=PaymentState.objects.fail,
         content_object=SalesLedgerFactory()
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p4',
-        state=PaymentState.objects.paid(),
+        state=PaymentState.objects.paid,
         content_object=SalesLedgerFactory()
     ))
     assert ['p4', 'p3', 'p2', 'p1'] == [
@@ -129,22 +129,22 @@ def test_manager_payments():
     VatSettingsFactory()
     PaymentLineFactory(payment=PaymentFactory(
         name='p1',
-        state=PaymentState.objects.due(),
+        state=PaymentState.objects.due,
         content_object=SalesLedgerFactory()
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p2',
-        state=PaymentState.objects.later(),
+        state=PaymentState.objects.later,
         content_object=SalesLedgerFactory()
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p3',
-        state=PaymentState.objects.fail(),
+        state=PaymentState.objects.fail,
         content_object=SalesLedgerFactory()
     ))
     PaymentLineFactory(payment=PaymentFactory(
         name='p4',
-        state=PaymentState.objects.paid(),
+        state=PaymentState.objects.paid,
         content_object=SalesLedgerFactory()
     ))
     assert ['p4', 'p3'] == [

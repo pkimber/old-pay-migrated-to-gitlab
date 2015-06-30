@@ -10,7 +10,10 @@ def check_payment(model_instance):
     """The 'Payment' model links to generic content."""
     # can we create a payment instance (need to set url before save).
     payment = model_instance.create_payment()
-    assert payment.paymentline_set.count() > 0, "no payment lines"
+    if payment.payment_type.amount:
+        assert payment.paymentline_set.count() > 0, "no payment lines"
+    else:
+        assert payment.paymentline_set.count() == 0, "no payment lines expected"
     payment.url = reverse('project.home')
     payment.url_failure = reverse('project.home')
     clean_and_save(payment)

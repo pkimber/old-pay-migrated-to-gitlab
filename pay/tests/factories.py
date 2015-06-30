@@ -7,8 +7,15 @@ from finance.models import VatSettings
 from pay.models import (
     Payment,
     PaymentLine,
+    PaymentPlan,
+    PaymentPlanAudit,
+    PaymentPlanHeader,
+    PaymentPlanInterval,
 )
-from stock.tests.factories import ProductFactory
+from stock.tests.factories import (
+    ProductCategoryFactory,
+    ProductFactory,
+)
 
 
 class PaymentFactory(factory.django.DjangoModelFactory):
@@ -50,3 +57,42 @@ class PaymentLineFactory(factory.django.DjangoModelFactory):
     @factory.sequence
     def line_number(n):
         return n
+
+
+class PaymentPlanAuditFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = PaymentPlanAudit
+
+
+class PaymentPlanHeaderFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = PaymentPlanHeader
+
+    @factory.sequence
+    def slug(n):
+        return 'header_slug_{:02d}'.format(n)
+
+    @factory.sequence
+    def name(n):
+        return 'header_name_{:02d}'.format(n)
+
+
+class PaymentPlanIntervalFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = PaymentPlanInterval
+
+    days_after = 10
+    #category = factory.SubFactory(ProductCategoryFactory)
+    payment_plan_header = factory.SubFactory(PaymentPlanHeaderFactory)
+    value = Decimal('99')
+
+
+class PaymentPlanFactory(factory.django.DjangoModelFactory):
+
+    class Meta:
+        model = PaymentPlan
+
+    payment_plan_header = factory.SubFactory(PaymentPlanHeaderFactory)

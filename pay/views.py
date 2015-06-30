@@ -4,10 +4,17 @@ import stripe
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
 from django.db import transaction
 from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_POST
-from django.views.generic import ListView
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    ListView,
+    UpdateView,
+)
 
 from braces.views import (
     LoginRequiredMixin,
@@ -22,9 +29,17 @@ from mail.service import (
 )
 from mail.tasks import process_mail
 
-from .forms import StripeForm
+from .forms import (
+    PaymentPlanHeaderEmptyForm,
+    PaymentPlanHeaderForm,
+    PaymentPlanIntervalEmptyForm,
+    PaymentPlanIntervalForm,
+    StripeForm,
+)
 from .models import (
     Payment,
+    PaymentPlanHeader,
+    PaymentPlanInterval,
     StripeCustomer,
 )
 from .service import (
@@ -132,6 +147,99 @@ class PaymentListView(
 
     def get_queryset(self):
         return Payment.objects.payments()
+
+
+class PaymentPlanHeaderCreateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, CreateView):
+
+    form_class = PaymentPlanHeaderForm
+    model = PaymentPlanHeader
+
+
+class PaymentPlanHeaderDeleteView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanHeaderEmptyForm
+    model = PaymentPlanHeader
+    template_name = 'pay/paymentplanheader_delete.html'
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            self.object.deleted = True
+            self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+    def get_success_url(self):
+        return reverse('pay.plan.header.list')
+
+
+class PaymentPlanHeaderDetailView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, DetailView):
+
+    model = PaymentPlanHeader
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(dict(detail=True))
+        return context
+
+
+class PaymentPlanHeaderListView(
+        LoginRequiredMixin, StaffuserRequiredMixin,
+        BaseMixin, ListView):
+
+    paginate_by = 5
+
+    def get_queryset(self):
+        return PaymentPlanHeader.objects.current()
+
+
+class PaymentPlanHeaderUpdateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanHeaderForm
+    model = PaymentPlanHeader
+
+
+class PaymentPlanIntervalCreateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, CreateView):
+
+    form_class = PaymentPlanIntervalForm
+    model = PaymentPlanInterval
+
+    def _get_payment_plan_header(self):
+        pk = self.kwargs.get('pk', None)
+        return get_object_or_404(PaymentPlanHeader, pk=pk)
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            self.object.payment_plan_header = self._get_payment_plan_header()
+            self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class PaymentPlanIntervalDeleteView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanIntervalEmptyForm
+    model = PaymentPlanInterval
+    template_name = 'pay/paymentplaninterval_delete.html'
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            self.object = form.save(commit=False)
+            self.object.deleted = True
+            self.object = form.save()
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class PaymentPlanIntervalUpdateView(
+        LoginRequiredMixin, StaffuserRequiredMixin, BaseMixin, UpdateView):
+
+    form_class = PaymentPlanIntervalForm
+    model = PaymentPlanInterval
 
 
 class StripeFormViewMixin(object):

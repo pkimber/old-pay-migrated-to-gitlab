@@ -1,0 +1,102 @@
+<div class="pure-u-1 pure-u-md-1-2">
+  <div class="l-box">
+    <table class="pure-table pure-table-bordered" width="100%">
+      <thead>
+        <tr valign="top">
+          <td>
+            Payment Plan
+          </td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr valign="top">
+          <td>
+            {% if detail %}
+            <a href="{% url 'pay.plan.header.update' paymentplanheader.pk %}">
+              <i class="fa fa-edit"></i>
+            {% else %}
+            <a href="{% url 'pay.plan.header.detail' paymentplanheader.pk %}">
+            {% endif %}
+              {{ paymentplanheader.slug }}
+            </a>
+            {{ paymentplanheader.name }}
+            {% if detail %}
+              {% if not paymentplanheader.intervals|length %}
+                <br />
+                <a href="{% url 'pay.plan.header.delete' paymentplanheader.pk %}">
+                  <i class="fa fa-trash-o"></i>
+                  <small>Delete payment plan...</small>
+                </a>
+              {% endif %}
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="pure-u-1 pure-u-md-1-2">
+  <div class="l-box">
+    <table class="pure-table pure-table-bordered" width="100%">
+      <thead>
+        <tr valign="top">
+          <td>
+            Days after
+          </td>
+          <td>
+            Value
+          </td>
+          {% if detail %}
+            <td>
+              Edit
+            </td>
+            <td>
+              Delete
+            </td>
+          {% endif %}
+        </tr>
+      </tbody>
+      <tbody>
+        {% for interval in paymentplanheader.intervals %}
+          <tr valign="top">
+            <td>
+              {{ interval.days_after }}
+            </td>
+            <td>
+              {{ interval.value }}
+            </td>
+            {% if detail %}
+              <td>
+                <a href="{% url 'pay.plan.interval.update' interval.pk %}">
+                  <i class="fa fa-edit"></i>
+                </a>
+              </td>
+              <td>
+                <a href="{% url 'pay.plan.interval.delete' interval.pk %}">
+                  <i class="fa fa-trash-o"></i>
+                  <small>Delete installment...</small>
+                </a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+        {% if detail %}
+          <tr valign="top">
+            <td>
+              <a href="{% url 'pay.plan.interval.create' paymentplanheader.pk %}">
+                <i class="fa fa-plus"></i>
+                <small>Add installment...</small>
+              </a>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
