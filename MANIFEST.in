@@ -1,4 +1,3 @@
-recursive-include pay/static *
 recursive-include pay/templates *
 
 include LICENSE

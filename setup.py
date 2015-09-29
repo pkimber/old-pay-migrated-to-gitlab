@@ -23,12 +23,11 @@ setup(
     packages=['pay', 'pay.migrations', 'pay.tests', 'pay.management', 'pay.management.commands'],
     package_data={
         'pay': [
-            'static/*.*',
             'templates/*.*',
             'templates/pay/*.*',
         ],
     },
-    version='0.1.30',
+    version='0.1.31',
     description='pay',
     author='Patrick Kimber',
     author_email='code@pkimber.net',
@@ -42,6 +41,7 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
+        'Framework :: Django :: 1.8',
         'Topic :: Office/Business :: Scheduling',
     ],
     long_description=get_readme(),
