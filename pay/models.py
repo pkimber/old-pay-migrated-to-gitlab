@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
-import reversion
+from reversion import revisions as reversion
 
 from finance.models import (
     legacy_vat_code,
