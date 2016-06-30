@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from decimal import Decimal
 
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -115,9 +115,9 @@ class Payment(TimeStampedModel):
         help_text='redirect to this location if the payment fails.'
     )
     # link to the object in the system which requested the payment
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey()
+    content_object = GenericForeignKey()
     # temporary for data migration
     # title = models.TextField()
     # quantity = models.IntegerField()
